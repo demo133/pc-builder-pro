@@ -372,7 +372,7 @@ export default function RecommendPage() {
                             border: "1px solid #334155",
                             borderRadius: "8px",
                           }}
-                          formatter={(value: number) => [`${value}%`, "占比"]}
+                          formatter={(value: any) => [`${value}%`, "占比"]}
                         />
                       </PieChart>
                     </ResponsiveContainer>

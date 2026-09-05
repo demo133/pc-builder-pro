@@ -45,6 +45,10 @@ interface Hardware {
     shopName: string
     crawledAt: string
   } | null
+  prices?: {
+    jd: { price: number | null; productUrl: string; shopName: string; crawledAt?: string }
+    tmall: { price: number | null; productUrl: string; shopName: string; crawledAt?: string }
+  }
 }
 
 export default function PricesPage() {

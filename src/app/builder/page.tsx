@@ -53,9 +53,16 @@ interface Hardware {
   specs: Record<string, any>
   tdp: number | null
   price: {
-    price: number
+    platform: string
     shopName: string
+    productUrl: string
+    price: number
+    crawledAt?: string
   } | null
+  prices?: {
+    jd: { price: number | null; productUrl: string; shopName: string; crawledAt?: string }
+    tmall: { price: number | null; productUrl: string; shopName: string; crawledAt?: string }
+  }
 }
 
 interface SelectedHardware {

@@ -36,7 +36,6 @@ export async function GET(request: NextRequest) {
     if (minPrice || maxPrice) {
       const allHardware = await prisma.hardware.findMany({
         where: category ? { category } : undefined,
-        select: { id: true },
         include: {
           prices: {
             where: { platform: "jd" },
