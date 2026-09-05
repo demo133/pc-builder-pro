@@ -1,6 +1,6 @@
 -- CreateTable
 CREATE TABLE "Hardware" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "category" TEXT NOT NULL,
     "brand" TEXT NOT NULL,
     "model" TEXT NOT NULL,
@@ -9,13 +9,15 @@ CREATE TABLE "Hardware" (
     "tdp" INTEGER,
     "msrp" INTEGER,
     "status" TEXT NOT NULL DEFAULT 'active',
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Hardware_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "Price" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "hardwareId" INTEGER NOT NULL,
     "platform" TEXT NOT NULL,
     "shopName" TEXT NOT NULL,
@@ -23,14 +25,15 @@ CREATE TABLE "Price" (
     "price" INTEGER NOT NULL,
     "originalPrice" INTEGER,
     "inStock" BOOLEAN NOT NULL DEFAULT true,
-    "crawledAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT "Price_hardwareId_fkey" FOREIGN KEY ("hardwareId") REFERENCES "Hardware" ("id") ON DELETE CASCADE ON UPDATE CASCADE
+    "crawledAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "Price_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "PresetConfig" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
     "budgetMin" INTEGER NOT NULL,
     "budgetMax" INTEGER NOT NULL,
@@ -42,13 +45,15 @@ CREATE TABLE "PresetConfig" (
     "source" TEXT,
     "sourceUrl" TEXT,
     "isVerified" BOOLEAN NOT NULL DEFAULT false,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "PresetConfig_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "CompatibilityRule" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "ruleType" TEXT NOT NULL,
     "categoryA" TEXT NOT NULL,
     "categoryB" TEXT,
@@ -57,21 +62,25 @@ CREATE TABLE "CompatibilityRule" (
     "message" TEXT NOT NULL,
     "suggestion" TEXT,
     "enabled" BOOLEAN NOT NULL DEFAULT true,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "CompatibilityRule_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "CrawlTask" (
-    "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+    "id" SERIAL NOT NULL,
     "hardwareId" INTEGER NOT NULL,
     "platform" TEXT NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'pending',
-    "lastSuccessAt" DATETIME,
+    "lastSuccessAt" TIMESTAMP(3),
     "lastError" TEXT,
     "retryCount" INTEGER NOT NULL DEFAULT 0,
-    "nextRunAt" DATETIME,
-    "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updatedAt" DATETIME NOT NULL
+    "nextRunAt" TIMESTAMP(3),
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "CrawlTask_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex
@@ -100,3 +109,6 @@ CREATE INDEX "CrawlTask_hardwareId_idx" ON "CrawlTask"("hardwareId");
 
 -- CreateIndex
 CREATE INDEX "CrawlTask_status_idx" ON "CrawlTask"("status");
+
+-- AddForeignKey
+ALTER TABLE "Price" ADD CONSTRAINT "Price_hardwareId_fkey" FOREIGN KEY ("hardwareId") REFERENCES "Hardware"("id") ON DELETE CASCADE ON UPDATE CASCADE;
