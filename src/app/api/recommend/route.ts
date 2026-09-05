@@ -74,11 +74,12 @@ export async function GET(request: NextRequest) {
     // 7. 获取每套方案的完整硬件信息
     const configsWithDetails = await Promise.all(
       top3.map(async (config) => {
-        const components = JSON.parse(config.components) as Record<string, number>
-        const hardwareIds = Object.values(components).filter(Boolean)
+        const components = JSON.parse(config.components) as Record<string, string>
+        const models = Object.values(components).filter(Boolean)
 
+        // 根据型号名称查询硬件
         const hardwareList = await prisma.hardware.findMany({
-          where: { id: { in: hardwareIds } },
+          where: { model: { in: models } },
           include: {
             prices: {
               where: { platform: "jd" },
@@ -88,12 +89,12 @@ export async function GET(request: NextRequest) {
           },
         })
 
-        const hardwareMap = new Map(hardwareList.map((h) => [h.id, h]))
+        const hardwareMap = new Map(hardwareList.map((h) => [h.model, h]))
 
         const detailedComponents: Record<string, any> = {}
         let actualTotal = 0
-        for (const [key, id] of Object.entries(components)) {
-          const hw = hardwareMap.get(id)
+        for (const [key, model] of Object.entries(components)) {
+          const hw = hardwareMap.get(model)
           if (hw) {
             const price = hw.prices[0]?.price || 0
             actualTotal += price
