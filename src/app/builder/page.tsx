@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo, useEffect, Suspense } from "react"
+import { useState, useMemo, useEffect, useCallback, Suspense, memo } from "react"
 import { useSearchParams } from "next/navigation"
 import {
   Cpu,
@@ -69,6 +69,118 @@ interface SelectedHardware {
   [key: string]: Hardware
 }
 
+// 提取硬件关键参数显示（移到组件外，供memo组件使用）
+const getKeySpecs = (hw: Hardware): string => {
+  const s = hw.specs || {}
+  if (hw.category === "CPU") {
+    return `${s.cores || "?"}核${s.threads || "?"}线程 / ${s.boostClock || "?"}GHz`
+  }
+  if (hw.category === "GPU") {
+    return `${s.vram || "?"} / ${s.cudaCores || s.streamProcessors || "?"}流处理器`
+  }
+  if (hw.category === "MOBO") {
+    return `${s.chipset || "?"} / ${s.memoryType || "?"}`
+  }
+  if (hw.category === "RAM") {
+    return `${s.capacity || "?"} / ${s.speed || "?"}MHz`
+  }
+  if (hw.category === "SSD") {
+    return `${s.capacity || "?"} / 读${s.readSpeed || "?"}MB/s`
+  }
+  if (hw.category === "PSU") {
+    return `${s.wattage || "?"}W / ${s.certification || "?"}`
+  }
+  if (hw.category === "CASE") {
+    return `${s.formFactor || "?"} / 限长${s.maxGpuLength || "?"}mm`
+  }
+  if (hw.category === "COOLER") {
+    return `${s.type || "?"} / ${s.tdp || "?"}W`
+  }
+  return ""
+}
+
+// memo化的硬件列表项，避免每次渲染都重新创建
+const HardwareListItem = memo(function HardwareListItem({
+  hw,
+  onSelect,
+}: {
+  hw: Hardware
+  onSelect: (hw: Hardware) => void
+}) {
+  const formatPrice = (cents: number) => `¥${(cents / 100).toFixed(2)}`
+  return (
+    <div
+      onClick={() => onSelect(hw)}
+      className="cursor-pointer rounded-lg border border-slate-700 bg-slate-800/50 p-3 transition-colors hover:border-cyan-500/50 hover:bg-slate-800"
+    >
+      <div className="flex items-center justify-between">
+        <div>
+          <div className="font-medium text-white">
+            {hw.brand} {hw.model}
+          </div>
+          <div className="mt-0.5 text-xs text-slate-400">
+            {getKeySpecs(hw)}
+          </div>
+        </div>
+        <div className="flex flex-col items-end gap-1">
+          {/* 京东价 */}
+          {hw.prices?.jd?.price ? (
+            <a
+              href={hw.prices.jd.productUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="flex items-center gap-1 rounded bg-red-500/10 px-2 py-0.5 text-xs hover:bg-red-500/20"
+            >
+              <span className="text-red-400">京东</span>
+              <span className="font-mono font-semibold text-emerald-400">
+                {formatPrice(hw.prices.jd.price)}
+              </span>
+            </a>
+          ) : (
+            <a
+              href={hw.prices?.jd?.productUrl || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="flex items-center gap-1 rounded bg-slate-700/30 px-2 py-0.5 text-xs hover:bg-slate-700/50"
+            >
+              <span className="text-slate-500">京东</span>
+              <span className="text-slate-500">去搜索</span>
+            </a>
+          )}
+          {/* 天猫价 */}
+          {hw.prices?.tmall?.price ? (
+            <a
+              href={hw.prices.tmall.productUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="flex items-center gap-1 rounded bg-orange-500/10 px-2 py-0.5 text-xs hover:bg-orange-500/20"
+            >
+              <span className="text-orange-400">天猫</span>
+              <span className="font-mono font-semibold text-emerald-400">
+                {formatPrice(hw.prices.tmall.price)}
+              </span>
+            </a>
+          ) : (
+            <a
+              href={hw.prices?.tmall?.productUrl || "#"}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="flex items-center gap-1 rounded bg-slate-700/30 px-2 py-0.5 text-xs hover:bg-slate-700/50"
+            >
+              <span className="text-slate-500">天猫</span>
+              <span className="text-slate-500">去搜索</span>
+            </a>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+})
+
 function BuilderPageContent() {
   const [selected, setSelected] = useState<SelectedHardware>({})
   const [activeCategory, setActiveCategory] = useState<CategoryKey | null>(null)
@@ -81,17 +193,29 @@ function BuilderPageContent() {
 
   // 获取某分类的硬件列表
   useEffect(() => {
-    if (!activeCategory) return
+    if (!activeCategory) {
+      // 弹窗关闭时清空列表，释放内存
+      setHardwareList([])
+      return
+    }
+    const controller = new AbortController()
     setLoading(true)
-    fetch(`/api/hardware?category=${activeCategory}&pageSize=100`)
+    fetch(`/api/hardware?category=${activeCategory}&pageSize=100`, {
+      signal: controller.signal,
+    })
       .then((res) => res.json())
       .then((data) => {
         if (data.success) {
           setHardwareList(data.data.list)
         }
       })
-      .catch(console.error)
-      .finally(() => setLoading(false))
+      .catch((err) => {
+        if (err.name !== "AbortError") console.error(err)
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setLoading(false)
+      })
+    return () => controller.abort()
   }, [activeCategory])
 
   // 计算总价（单位：分）
@@ -104,31 +228,25 @@ function BuilderPageContent() {
   // 已选硬件数量
   const selectedCount = Object.keys(selected).length
 
-  // 筛选后的列表
-  const filteredList = hardwareList.filter((item) => {
-    const matchSearch =
-      !searchTerm ||
-      item.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.brand.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchBrand = brandFilter === "all" || item.brand === brandFilter
-    return matchSearch && matchBrand
-  })
+  // 筛选后的列表（useMemo缓存）
+  const filteredList = useMemo(() => {
+    const result = hardwareList.filter((item) => {
+      const matchSearch =
+        !searchTerm ||
+        item.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.brand.toLowerCase().includes(searchTerm.toLowerCase())
+      const matchBrand = brandFilter === "all" || item.brand === brandFilter
+      return matchSearch && matchBrand
+    })
+    // 最多渲染30条，避免DOM过多导致卡顿
+    return result.slice(0, 30)
+  }, [hardwareList, searchTerm, brandFilter])
 
   // 获取该分类的所有品牌
   const brands = useMemo(() => {
     const set = new Set(hardwareList.map((h) => h.brand))
     return Array.from(set)
   }, [hardwareList])
-
-  // 选择硬件
-  const handleSelect = (hardware: Hardware) => {
-    if (activeCategory) {
-      setSelected((prev) => ({ ...prev, [activeCategory]: hardware }))
-    }
-    setActiveCategory(null)
-    setSearchTerm("")
-    setBrandFilter("all")
-  }
 
   // 删除已选硬件
   const handleRemove = (category: string) => {
@@ -263,35 +381,31 @@ function BuilderPageContent() {
     URL.revokeObjectURL(url)
   }
 
-  // 提取硬件关键参数显示
-  const getKeySpecs = (hw: Hardware): string => {
-    const s = hw.specs || {}
-    if (hw.category === "CPU") {
-      return `${s.cores || "?"}核${s.threads || "?"}线程 / ${s.boostClock || "?"}GHz`
+  // 给兼容性报告的components做memo，避免每次渲染都是新对象
+  const compatibilityComponents = useMemo(
+    () =>
+      ({
+        CPU: selected.CPU,
+        GPU: selected.GPU,
+        MOBO: selected.MOBO,
+        RAM: selected.RAM,
+        SSD: selected.SSD,
+        PSU: selected.PSU,
+        CASE: selected.CASE,
+        COOLER: selected.COOLER,
+      }) as Components,
+    [selected]
+  )
+
+  // handleSelect用useCallback稳定引用，让memo子组件不重渲染
+  const handleSelect = useCallback((hardware: Hardware) => {
+    if (activeCategory) {
+      setSelected((prev) => ({ ...prev, [activeCategory]: hardware }))
     }
-    if (hw.category === "GPU") {
-      return `${s.vram || "?"} / ${s.bitWidth || "?"}bit`
-    }
-    if (hw.category === "MOBO") {
-      return `${s.chipset || "?"} / ${s.memoryType || "?"}`
-    }
-    if (hw.category === "RAM") {
-      return `${s.capacity || "?"} / ${s.speed || "?"}MHz`
-    }
-    if (hw.category === "SSD") {
-      return `${s.capacity || "?"} / 读${s.readSpeed || "?"}MB/s`
-    }
-    if (hw.category === "PSU") {
-      return `${s.wattage || "?"}W / ${s.certification || "?"}`
-    }
-    if (hw.category === "CASE") {
-      return `${s.formFactor?.join("/") || "?"} / 限长${s.maxGpuLength || "?"}mm`
-    }
-    if (hw.category === "COOLER") {
-      return `${s.type || "?"} / ${s.tdpRating || "?"}W`
-    }
-    return ""
-  }
+    setActiveCategory(null)
+    setSearchTerm("")
+    setBrandFilter("all")
+  }, [activeCategory])
 
   return (
     <div className="min-h-screen pb-20">
@@ -444,20 +558,7 @@ function BuilderPageContent() {
 
               {/* 兼容性体检报告 */}
               <div className="mt-4">
-                <CompatibilityReport
-                  components={
-                    {
-                      CPU: selected.CPU,
-                      GPU: selected.GPU,
-                      MOBO: selected.MOBO,
-                      RAM: selected.RAM,
-                      SSD: selected.SSD,
-                      PSU: selected.PSU,
-                      CASE: selected.CASE,
-                      COOLER: selected.COOLER,
-                    } as Components
-                  }
-                />
+                <CompatibilityReport components={compatibilityComponents} />
               </div>
             </div>
           </div>
@@ -514,78 +615,16 @@ function BuilderPageContent() {
                 没有找到匹配的硬件
               </div>
             ) : (
-              filteredList.map((hw) => (
-                <div
-                  key={hw.id}
-                  onClick={() => handleSelect(hw)}
-                  className="cursor-pointer rounded-lg border border-slate-700 bg-slate-800/50 p-3 transition-colors hover:border-cyan-500/50 hover:bg-slate-800"
-                >
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="font-medium text-white">
-                        {hw.brand} {hw.model}
-                      </div>
-                      <div className="mt-0.5 text-xs text-slate-400">
-                        {getKeySpecs(hw)}
-                      </div>
-                    </div>
-                    <div className="flex flex-col items-end gap-1">
-                      {/* 京东价 */}
-                      {hw.prices?.jd?.price ? (
-                        <a
-                          href={hw.prices.jd.productUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          className="flex items-center gap-1 rounded bg-red-500/10 px-2 py-0.5 text-xs hover:bg-red-500/20"
-                        >
-                          <span className="text-red-400">京东</span>
-                          <span className="font-mono font-semibold text-emerald-400">
-                            {formatPrice(hw.prices.jd.price)}
-                          </span>
-                        </a>
-                      ) : (
-                        <a
-                          href={hw.prices?.jd?.productUrl || "#"}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          className="flex items-center gap-1 rounded bg-slate-700/30 px-2 py-0.5 text-xs hover:bg-slate-700/50"
-                        >
-                          <span className="text-slate-500">京东</span>
-                          <span className="text-slate-500">去搜索</span>
-                        </a>
-                      )}
-                      {/* 淘宝价 */}
-                      {hw.prices?.tmall?.price ? (
-                        <a
-                          href={hw.prices.tmall.productUrl}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          className="flex items-center gap-1 rounded bg-orange-500/10 px-2 py-0.5 text-xs hover:bg-orange-500/20"
-                        >
-                          <span className="text-orange-400">天猫</span>
-                          <span className="font-mono font-semibold text-emerald-400">
-                            {formatPrice(hw.prices.tmall.price)}
-                          </span>
-                        </a>
-                      ) : (
-                        <a
-                          href={hw.prices?.tmall?.productUrl || "#"}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          onClick={(e) => e.stopPropagation()}
-                          className="flex items-center gap-1 rounded bg-slate-700/30 px-2 py-0.5 text-xs hover:bg-slate-700/50"
-                        >
-                          <span className="text-slate-500">天猫</span>
-                          <span className="text-slate-500">去搜索</span>
-                        </a>
-                      )}
-                    </div>
+              <>
+                {filteredList.map((hw) => (
+                  <HardwareListItem key={hw.id} hw={hw} onSelect={handleSelect} />
+                ))}
+                {filteredList.length === 30 && hardwareList.length > 30 && (
+                  <div className="py-2 text-center text-xs text-slate-500">
+                    仅显示前30条，使用搜索或品牌筛选缩小范围
                   </div>
-                </div>
-              ))
+                )}
+              </>
             )}
           </div>
         </DialogContent>
