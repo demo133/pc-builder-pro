@@ -41,5 +41,15 @@
   "packageManager": "pnpm@11.25.0",
   "prisma": {
     "seed": "tsx prisma/seed.ts"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "workerd",
+      "msgpackr-extract",
+      "prisma",
+      "@prisma/engines",
+      "@prisma/client"
+    ]
   }
 }
