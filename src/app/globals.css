@@ -66,11 +66,86 @@ body {
   background: #475569;
 }
 
-/* 卡片hover效果 */
+/* 平滑滚动 */
+html {
+  scroll-behavior: smooth;
+}
+
+/* 卡片hover效果 - 苹果风格 */
 .card-hover {
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition: all 0.4s cubic-bezier(0.25, 0.1, 0.25, 1);
+  will-change: transform;
 }
 .card-hover:hover {
   border-color: rgba(6, 182, 212, 0.5);
-  box-shadow: 0 0 20px rgba(6, 182, 212, 0.1);
+  box-shadow: 0 8px 30px rgba(6, 182, 212, 0.15), 0 0 1px rgba(6, 182, 212, 0.3);
+  transform: translateY(-4px);
+}
+.card-hover:active {
+  transform: translateY(-2px) scale(0.99);
+}
+
+/* 按钮苹果风格悬停 */
+button, a[role="button"] {
+  transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+/* 渐变文字动画 */
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+.gradient-text {
+  background: linear-gradient(135deg, #06b6d4, #8b5cf6, #06b6d4);
+  background-size: 200% 200%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 4s ease infinite;
+}
+
+/* 浮动动画 */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.float-animation {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* 脉冲光晕 */
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+.pulse-glow {
+  animation: pulse-glow 4s ease-in-out infinite;
+}
+
+/* 入场动画 */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s cubic-bezier(0.25, 0.1, 0.25, 1) both;
+}
+
+/* 延迟入场 */
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+
+/* 选中态高亮 */
+::selection {
+  background: rgba(6, 182, 212, 0.3);
+  color: #fff;
 }

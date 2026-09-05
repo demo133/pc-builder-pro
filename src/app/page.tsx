@@ -2,6 +2,9 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { ScrollReveal } from "@/components/ScrollReveal"
+import { Counter } from "@/components/Counter"
+import { ParallaxGlow } from "@/components/ParallaxGlow"
 import {
   Cpu,
   Monitor,
@@ -82,48 +85,50 @@ export default function Home() {
     <div className="min-h-screen">
       {/* Hero区域 */}
       <section className="relative overflow-hidden">
-        {/* 背景装饰 */}
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -top-40 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-cyan-500/10 blur-3xl" />
-          <div className="absolute top-20 right-20 h-60 w-60 rounded-full bg-violet-500/10 blur-3xl" />
-          <div className="absolute bottom-0 left-20 h-60 w-60 rounded-full bg-emerald-500/10 blur-3xl" />
-        </div>
+        {/* 视差背景光晕 */}
+        <ParallaxGlow />
 
-        <div className="relative mx-auto max-w-6xl px-4 py-20 text-center">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-1.5 text-sm text-cyan-400">
+        <div className="relative mx-auto max-w-6xl px-4 py-24 text-center">
+          <div className="animate-fade-in-up mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-1.5 text-sm text-cyan-400">
             <Monitor className="h-4 w-4" />
             DIY 装机，从这里开始
           </div>
-          <h1 className="mb-6 text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
-            专业的 <span className="text-cyan-400">PC 硬件</span> 选型助手
+          <h1 className="animate-fade-in-up delay-100 mb-6 text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
+            专业的 <span className="gradient-text">PC 硬件</span> 选型助手
           </h1>
-          <p className="mx-auto mb-10 max-w-2xl text-lg text-slate-400">
+          <p className="animate-fade-in-up delay-200 mx-auto mb-10 max-w-2xl text-lg text-slate-400">
             智能兼容性检查、实时价格监控、预算配置推荐——让每一分钱都花在刀刃上
           </p>
-          <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Button asChild size="lg" className="bg-cyan-500 hover:bg-cyan-600">
+          <div className="animate-fade-in-up delay-300 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <Button asChild size="lg" className="bg-cyan-500 hover:bg-cyan-600 hover:shadow-lg hover:shadow-cyan-500/25">
               <Link href="/builder">
                 开始装机
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline">
+            <Button asChild size="lg" variant="outline" className="hover:bg-slate-800">
               <Link href="/recommend">按预算推荐</Link>
             </Button>
           </div>
 
-          {/* 数据统计 */}
-          <div className="mx-auto mt-16 grid max-w-3xl grid-cols-3 gap-8">
+          {/* 数据统计 - 数字计数动画 */}
+          <div className="animate-fade-in-up delay-400 mx-auto mt-16 grid max-w-3xl grid-cols-3 gap-8">
             <div>
-              <div className="text-3xl font-bold text-white">88+</div>
+              <div className="text-3xl font-bold text-white">
+                <Counter end={88} suffix="+" />
+              </div>
               <div className="mt-1 text-sm text-slate-400">硬件型号</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-white">15</div>
+              <div className="text-3xl font-bold text-white">
+                <Counter end={15} />
+              </div>
               <div className="mt-1 text-sm text-slate-400">兼容性检查项</div>
             </div>
             <div>
-              <div className="text-3xl font-bold text-white">3</div>
+              <div className="text-3xl font-bold text-white">
+                <Counter end={3} />
+              </div>
               <div className="mt-1 text-sm text-slate-400">预置配置方案</div>
             </div>
           </div>
@@ -132,27 +137,31 @@ export default function Home() {
 
       {/* 核心功能 */}
       <section className="mx-auto max-w-6xl px-4 py-16">
-        <div className="mb-10 text-center">
-          <h2 className="text-2xl font-bold text-white">核心功能</h2>
-          <p className="mt-2 text-sm text-slate-400">四大核心能力，覆盖装机全流程</p>
-        </div>
+        <ScrollReveal>
+          <div className="mb-10 text-center">
+            <h2 className="text-2xl font-bold text-white">核心功能</h2>
+            <p className="mt-2 text-sm text-slate-400">四大核心能力，覆盖装机全流程</p>
+          </div>
+        </ScrollReveal>
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {FEATURES.map((feature) => {
+          {FEATURES.map((feature, index) => {
             const Icon = feature.icon
             return (
-              <Link key={feature.title} href={feature.href}>
-                <Card className="card-hover h-full border-slate-700 bg-slate-800/50">
-                  <CardHeader>
-                    <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-lg ${colorMap[feature.color]}`}>
-                      <Icon className="h-5 w-5" />
-                    </div>
-                    <CardTitle className="text-white">{feature.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-sm text-slate-400">
-                    {feature.desc}
-                  </CardContent>
-                </Card>
-              </Link>
+              <ScrollReveal key={feature.title} delay={index * 100}>
+                <Link href={feature.href}>
+                  <Card className="card-hover h-full border-slate-700 bg-slate-800/50">
+                    <CardHeader>
+                      <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-lg ${colorMap[feature.color]}`}>
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <CardTitle className="text-white">{feature.title}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-sm text-slate-400">
+                      {feature.desc}
+                    </CardContent>
+                  </Card>
+                </Link>
+              </ScrollReveal>
             )
           })}
         </div>
@@ -161,26 +170,30 @@ export default function Home() {
       {/* 使用流程 */}
       <section className="border-y border-slate-700/50 bg-slate-900/30">
         <div className="mx-auto max-w-6xl px-4 py-16">
-          <div className="mb-10 text-center">
-            <h2 className="text-2xl font-bold text-white">四步完成装机</h2>
-            <p className="mt-2 text-sm text-slate-400">简单流程，小白也能轻松上手</p>
-          </div>
+          <ScrollReveal>
+            <div className="mb-10 text-center">
+              <h2 className="text-2xl font-bold text-white">四步完成装机</h2>
+              <p className="mt-2 text-sm text-slate-400">简单流程，小白也能轻松上手</p>
+            </div>
+          </ScrollReveal>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             {STEPS.map((step, index) => {
               const Icon = step.icon
               return (
-                <div key={step.title} className="relative">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-cyan-400">
-                      <Icon className="h-5 w-5" />
+                <ScrollReveal key={step.title} delay={index * 100}>
+                  <div className="relative">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-cyan-400">
+                        <Icon className="h-5 w-5" />
+                      </div>
+                      <Badge variant="outline" className="text-xs text-slate-400">
+                        步骤 {index + 1}
+                      </Badge>
                     </div>
-                    <Badge variant="outline" className="text-xs text-slate-400">
-                      步骤 {index + 1}
-                    </Badge>
+                    <h3 className="mt-3 font-semibold text-white">{step.title}</h3>
+                    <p className="mt-1 text-sm text-slate-400">{step.desc}</p>
                   </div>
-                  <h3 className="mt-3 font-semibold text-white">{step.title}</h3>
-                  <p className="mt-1 text-sm text-slate-400">{step.desc}</p>
-                </div>
+                </ScrollReveal>
               )
             })}
           </div>
@@ -189,18 +202,20 @@ export default function Home() {
 
       {/* 热门配置推荐 */}
       <section className="mx-auto max-w-6xl px-4 py-16">
-        <div className="mb-10 flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-white">热门配置方案</h2>
-            <p className="mt-2 text-sm text-slate-400">经过验证的高性价比配置</p>
+        <ScrollReveal>
+          <div className="mb-10 flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-white">热门配置方案</h2>
+              <p className="mt-2 text-sm text-slate-400">经过验证的高性价比配置</p>
+            </div>
+            <Button asChild variant="outline" size="sm">
+              <Link href="/recommend">
+                查看更多
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
-          <Button asChild variant="outline" size="sm">
-            <Link href="/recommend">
-              查看更多
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Link>
-          </Button>
-        </div>
+        </ScrollReveal>
         <div className="grid gap-6 md:grid-cols-3">
           {[
             {
@@ -221,42 +236,46 @@ export default function Home() {
               desc: "7800X3D + RTX 4070 Super，2K电竞无压力",
               tag: "高端",
             },
-          ].map((config) => (
-            <Card key={config.name} className="card-hover border-slate-700 bg-slate-800/50">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-between">
-                  <Badge className="bg-cyan-500/10 text-cyan-400">{config.tag}</Badge>
-                  <div className="text-xl font-bold text-emerald-400">{config.price}</div>
-                </div>
-                <h3 className="mt-3 font-semibold text-white">{config.name}</h3>
-                <p className="mt-1 text-sm text-slate-400">{config.desc}</p>
-                <Button asChild className="mt-4 w-full" size="sm" variant="outline">
-                  <Link href="/recommend">查看详情</Link>
-                </Button>
-              </CardContent>
-            </Card>
+          ].map((config, index) => (
+            <ScrollReveal key={config.name} delay={index * 100}>
+              <Card className="card-hover h-full border-slate-700 bg-slate-800/50">
+                <CardContent className="p-6">
+                  <div className="flex items-center justify-between">
+                    <Badge className="bg-cyan-500/10 text-cyan-400">{config.tag}</Badge>
+                    <div className="text-xl font-bold text-emerald-400">{config.price}</div>
+                  </div>
+                  <h3 className="mt-3 font-semibold text-white">{config.name}</h3>
+                  <p className="mt-1 text-sm text-slate-400">{config.desc}</p>
+                  <Button asChild className="mt-4 w-full" size="sm" variant="outline">
+                    <Link href="/recommend">查看详情</Link>
+                  </Button>
+                </CardContent>
+              </Card>
+            </ScrollReveal>
           ))}
         </div>
       </section>
 
       {/* CTA */}
       <section className="mx-auto max-w-6xl px-4 pb-16">
-        <Card className="border-cyan-500/30 bg-gradient-to-r from-cyan-500/10 to-blue-500/10">
-          <CardContent className="flex flex-col items-center justify-between gap-4 p-8 sm:flex-row">
-            <div>
-              <h3 className="text-xl font-bold text-white">准备好开始装机了吗？</h3>
-              <p className="mt-1 text-sm text-slate-400">
-                立即使用智能选型工具，打造属于你的完美配置
-              </p>
-            </div>
-            <Button asChild size="lg" className="bg-cyan-500 hover:bg-cyan-600">
-              <Link href="/builder">
-                立即开始
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
-          </CardContent>
-        </Card>
+        <ScrollReveal>
+          <Card className="card-hover border-cyan-500/30 bg-gradient-to-r from-cyan-500/10 to-blue-500/10">
+            <CardContent className="flex flex-col items-center justify-between gap-4 p-8 sm:flex-row">
+              <div>
+                <h3 className="text-xl font-bold text-white">准备好开始装机了吗？</h3>
+                <p className="mt-1 text-sm text-slate-400">
+                  立即使用智能选型工具，打造属于你的完美配置
+                </p>
+              </div>
+              <Button asChild size="lg" className="bg-cyan-500 hover:bg-cyan-600 hover:shadow-lg hover:shadow-cyan-500/25">
+                <Link href="/builder">
+                  立即开始
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Link>
+              </Button>
+            </CardContent>
+          </Card>
+        </ScrollReveal>
       </section>
 
       {/* 底部 */}
