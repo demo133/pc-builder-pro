@@ -97,9 +97,12 @@ interface ConfigResult {
   components: Record<string, HardwareItem>
 }
 
+const QUICK_BUDGETS = [3000, 5000, 6000, 8000, 10000, 15000]
+
 export default function RecommendPage() {
   const router = useRouter()
   const [budget, setBudget] = useState(6000)
+  const [budgetInput, setBudgetInput] = useState("6000")
   const [useCase, setUseCase] = useState("gaming")
   const [priority, setPriority] = useState("value")
   const [loading, setLoading] = useState(false)
@@ -108,6 +111,35 @@ export default function RecommendPage() {
   const [hasSearched, setHasSearched] = useState(false)
 
   const formatPrice = (cents: number) => `¥${(cents / 100).toFixed(0)}`
+
+  // 滑块拖动：实时更新预算和输入框
+  const handleSliderChange = (value: number[]) => {
+    const v = value[0]
+    setBudget(v)
+    setBudgetInput(String(v))
+  }
+
+  // 输入框：自由输入，不限制
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value.replace(/[^\d]/g, "")
+    setBudgetInput(val)
+  }
+
+  // 输入框失焦：限制范围并同步
+  const handleInputBlur = () => {
+    let v = parseInt(budgetInput) || 6000
+    v = Math.max(2000, Math.min(20000, v))
+    // 对齐到100的整数倍
+    v = Math.round(v / 100) * 100
+    setBudget(v)
+    setBudgetInput(String(v))
+  }
+
+  // 快捷预算按钮
+  const handleQuickBudget = (v: number) => {
+    setBudget(v)
+    setBudgetInput(String(v))
+  }
 
   const handleGenerate = async () => {
     setLoading(true)
@@ -174,18 +206,19 @@ export default function RecommendPage() {
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-slate-400">¥</span>
                   <Input
-                    type="number"
-                    value={budget}
-                    onChange={(e) =>
-                      setBudget(Math.max(2000, Math.min(20000, parseInt(e.target.value) || 2000)))
-                    }
-                    className="w-28 text-center font-mono text-cyan-400"
+                    type="text"
+                    inputMode="numeric"
+                    value={budgetInput}
+                    onChange={handleInputChange}
+                    onBlur={handleInputBlur}
+                    onKeyDown={(e) => e.key === "Enter" && (e.target as HTMLInputElement).blur()}
+                    className="w-32 text-center font-mono text-lg font-bold text-cyan-400"
                   />
                 </div>
               </div>
               <Slider
                 value={[budget]}
-                onValueChange={(value) => setBudget(value[0])}
+                onValueChange={handleSliderChange}
                 min={2000}
                 max={20000}
                 step={100}
@@ -193,6 +226,22 @@ export default function RecommendPage() {
               <div className="mt-1 flex justify-between text-xs text-slate-500">
                 <span>¥2,000</span>
                 <span>¥20,000</span>
+              </div>
+              {/* 快捷预算按钮 */}
+              <div className="mt-3 flex flex-wrap gap-2">
+                {QUICK_BUDGETS.map((v) => (
+                  <button
+                    key={v}
+                    onClick={() => handleQuickBudget(v)}
+                    className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+                      budget === v
+                        ? "bg-cyan-500 text-white"
+                        : "bg-slate-700/50 text-slate-300 hover:bg-slate-700"
+                    }`}
+                  >
+                    ¥{v.toLocaleString()}
+                  </button>
+                ))}
               </div>
             </div>
 
