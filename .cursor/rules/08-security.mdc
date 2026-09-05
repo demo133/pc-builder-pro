@@ -1,0 +1,74 @@
+---
+description: 安全规则，防止SQL注入、XSS、密钥泄露等安全问题
+alwaysApply: true
+globs:
+  - "**/api/**"
+  - "**/*.ts"
+  - "**/*.tsx"
+---
+
+# 安全规则
+
+> 来源：提炼自 cursor-engineering-rules 的 OWASP Top 10 覆盖、PatrickJS Next.js Security 规则
+
+## 密钥管理
+- 所有密钥、API Key、数据库密码必须放在 `.env` 文件
+- `.env` 必须在 `.gitignore` 中，绝对不能提交到 git
+- 代码中通过 `process.env.XXX` 读取，不要硬编码
+- 前端代码（'use client'）中不能出现任何密钥，会暴露给用户
+- 需要给前端用的变量加 `NEXT_PUBLIC_` 前缀（如 `NEXT_PUBLIC_SITE_URL`）
+
+## 输入验证
+- 所有 API 路由的 query 参数和 body 必须验证
+- 数字参数（id、price、page）必须是数字，不能直接用字符串
+- 字符串参数做长度限制和基本过滤
+- 不要直接把用户输入拼接到 SQL（用 Prisma 就不会有这个问题）
+
+```ts
+// ✅ 正确：验证参数
+const id = Number(searchParams.get('id'))
+if (isNaN(id) || id < 1) {
+  return NextResponse.json({ success: false, error: { code: 'INVALID_ID' } }, { status: 400 })
+}
+
+// ❌ 错误：直接用
+const id = searchParams.get('id')
+const data = await prisma.hardware.findUnique({ where: { id: id as any } })
+```
+
+## XSS 防护
+- 不要用 `dangerouslySetInnerHTML`，除非明确需要且内容已转义
+- 用户输入的内容渲染时 React 会自动转义，不要绕过
+- 配置分享链接中的参数不要直接渲染为 HTML
+
+## API 安全
+- 爬虫写入价格的 API（POST /api/prices）必须加 API Key 鉴权
+- 管理类接口（触发爬虫、删除数据）必须鉴权
+- 公开查询接口（GET /api/hardware）可以不鉴权但要加频率限制意识
+- API 返回错误时不要泄露数据库结构或内部路径
+
+```ts
+// ✅ 正确：鉴权
+const apiKey = request.headers.get('x-api-key')
+if (apiKey !== process.env.CRON_API_KEY) {
+  return NextResponse.json({ success: false, error: { code: 'UNAUTHORIZED' } }, { status: 401 })
+}
+```
+
+## 依赖安全
+- 引入新依赖前考虑是否真的需要
+- 不要使用已废弃或无人维护的包
+- 定期运行 `pnpm audit` 检查依赖漏洞
+- 爬虫相关依赖（playwright）保持更新
+
+## 数据安全
+- 用户保存的配置数据不要包含个人敏感信息
+- 价格数据标注来源和更新时间，不编造实时数据
+- 数据库备份不要包含在 git 仓库里
+
+## 爬虫合规
+- 爬取京东/天猫时遵守 robots.txt
+- 请求频率控制在合理范围（间隔3-8秒）
+- 不登录、不模拟真实用户行为
+- 只抓取公开的价格信息，不抓取用户数据
+- 被封后暂停，不要硬刚

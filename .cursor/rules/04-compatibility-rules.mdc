@@ -1,0 +1,145 @@
+---
+description: 硬件兼容性检查规则，所有兼容性逻辑必须遵循此规范
+alwaysApply: true
+globs:
+  - "src/lib/compatibility.ts"
+  - "src/components/CompatibilityReport.tsx"
+---
+
+# 兼容性检查规则
+
+所有兼容性检查逻辑集中在 `src/lib/compatibility.ts`，导出函数：
+```ts
+checkCompatibility(components: Components): { score: number; issues: Issue[] }
+```
+
+## 检查级别
+- **fatal**（🔴 致命）：必须修改，否则装不了机
+- **warning**（🟡 警告）：建议优化，可能影响体验
+- **info**（🔵 提示）：可选提升，不影响使用
+
+## 致命检查（fatal，-30分/个）
+
+### 1. CPU ↔ 主板插槽
+```
+if cpu.specs.socket !== mobo.specs.socket
+→ "CPU插槽({cpu.socket})与主板({mobo.socket})不匹配"
+```
+
+### 2. 内存类型
+```
+if ram.specs.type !== mobo.specs.memoryType
+→ "主板支持{mobo.memoryType}内存，当前选择{ram.type}"
+```
+
+### 3. 内存插槽数量
+```
+if ram.specs.moduleCount > mobo.specs.memorySlots
+→ "主板只有{mobo.slots}个内存槽，选择了{ram.count}条内存"
+```
+
+### 4. 电源功率
+```
+totalTDP = cpu.tdp + gpu.tdp + 50(其他)
+required = totalTDP * 1.3
+if psu.specs.wattage < required
+→ "整机满载约{total}W，建议{required}W以上电源，当前{psu}W不足"
+```
+
+### 5. 显卡长度
+```
+if gpu.specs.length > case.specs.maxGpuLength
+→ "显卡长{gpu.length}mm，机箱限长{case.length}mm，装不下"
+```
+
+### 6. 散热器高度
+```
+if cooler.specs.height > case.specs.maxCoolerHeight
+→ "散热器高{cooler.h}mm，机箱限高{case.h}mm，侧板盖不上"
+```
+
+### 7. 散热器插槽支持
+```
+if cpu.specs.socket not in cooler.specs.sockets
+→ "散热器不支持{cpu.socket}插槽"
+```
+
+## 警告检查（warning，-10分/个）
+
+### 8. 高U低显 / 低U高显
+CPU和GPU按性能分档（1-5），差距>=2时警告：
+- CPU档位：i3/R5=2, i5/R7=3, i7/R9=4, i9=5
+- GPU档位：RTX4060=2, 4070=3, 4080=4, 4090=5
+```
+if cpuTier - gpuTier >= 2 → "高端CPU搭配低端显卡，游戏性能受显卡限制（高U低显）"
+if gpuTier - cpuTier >= 2 → "高端显卡搭配低端CPU，可能存在CPU瓶颈"
+```
+
+### 9. 散热器TDP不足
+```
+if cooler.specs.tdpRating < cpu.tdp
+→ "散热器标称TDP({cooler.tdp}W)低于CPU TDP({cpu.tdp}W)，高负载可能过热"
+```
+
+### 10. 电源品质不匹配
+高端配置（总价>8000）使用 80+ White 或无牌电源时警告。
+
+### 11. M.2插槽不足
+```
+if M.2接口SSD数量 > mobo.specs.m2Slots
+→ "主板只有{mobo.m2}个M.2插槽，选择了{count}块M.2固态"
+```
+
+### 12. 机箱版型不支持
+```
+if mobo.specs.formFactor not in case.specs.formFactor
+→ "机箱不支持{mobo.formFactor}版型主板"
+```
+
+## 提示检查（info，-3分/个）
+
+### 13. 内存频率超限
+```
+if ram.specs.speed > cpu.specs.maxMemorySpeed
+→ "CPU最高支持{cpu.max}MHz内存，当前{ram.speed}MHz会自动降频"
+```
+
+### 14. 电源余量偏小
+```
+if psu.wattage - required < 100
+→ "电源余量较小，未来升级高端显卡可能需要换电源"
+```
+
+### 15. 无核显CPU未选显卡
+```
+if cpu.hasGraphics === false and gpu not selected
+→ "该CPU无核显，必须搭配独立显卡才能开机"
+```
+
+## 评分计算
+```
+score = 100 - (fatalCount * 30) - (warningCount * 10) - (infoCount * 3)
+score = max(0, score)
+```
+
+## 输出格式
+```ts
+interface Issue {
+  level: 'fatal' | 'warning' | 'info';
+  category: string;  // 问题分类，如"插槽兼容"、"电源功率"
+  message: string;   // 问题描述
+  suggestion?: string; // 修改建议
+}
+
+interface CompatibilityResult {
+  score: number;
+  issues: Issue[];
+  summary: string;  // 一句话总评
+}
+```
+
+## 新增检查项流程
+1. 在本文件中添加规则说明
+2. 在 compatibility.ts 中实现检查逻辑
+3. 在 CompatibilityReport 组件中确保能正确显示新级别
+4. 用一套故意不兼容的配置测试

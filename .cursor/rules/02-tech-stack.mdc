@@ -1,0 +1,81 @@
+---
+description: 技术栈约定和最佳实践，生成代码时必须遵守
+alwaysApply: true
+globs:
+  - "**/*.tsx"
+  - "**/*.ts"
+  - "**/*.js"
+---
+
+# 技术栈约定
+
+## 必须使用
+- Next.js 14+ App Router（不要用 Pages Router）
+- TypeScript（严格模式）
+- shadcn/ui 组件（不要自己造轮子，先看有没有现成组件）
+- Tailwind CSS（不要写 CSS 文件，除非全局样式）
+- Prisma ORM（不要手写 SQL）
+- Recharts（图表，不要用其他图表库）
+- lucide-react（图标）
+
+## 组件写法
+```tsx
+// 正确示例
+'use client';
+
+import { useState } from 'react';
+import { Card } from '@/components/ui/card';
+
+interface HardwarePickerProps {
+  category: string;
+  onSelect: (id: number) => void;
+}
+
+export function HardwarePicker({ category, onSelect }: HardwarePickerProps) {
+  const [open, setOpen] = useState(false);
+  // ...
+}
+```
+
+## API 路由写法
+```ts
+// app/api/hardware/route.ts
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+
+export async function GET(request: Request) {
+  const { searchParams } = new URL(request.url);
+  const category = searchParams.get('category');
+
+  try {
+    const data = await prisma.hardware.findMany({
+      where: category ? { category } : undefined,
+      include: { prices: { orderBy: { crawledAt: 'desc' }, take: 1 } },
+    });
+    return NextResponse.json({ success: true, data });
+  } catch (error) {
+    return NextResponse.json(
+      { success: false, error: { code: 'DB_ERROR', message: '数据库查询失败' } },
+      { status: 500 }
+    );
+  }
+}
+```
+
+## Prisma 使用规范
+- 全局单例：src/lib/prisma.ts 中导出 prisma 实例
+- 查询时用 include 关联价格数据，避免 N+1 查询
+- 价格取最新一条：`include: { prices: { orderBy: { crawledAt: 'desc' }, take: 1 } }`
+- 大查询加分页，不要一次性查全表
+
+## 环境变量
+- 数据库连接：DATABASE_URL
+- 爬虫API密钥：CRON_API_KEY
+- 不要在代码里硬编码任何密钥
+
+## 不要做
+- 不要用 useEffect 做数据获取（用 React Query 或服务端组件）
+- 不要用 any，用 unknown 或具体类型
+- 不要在客户端组件里直接连数据库
+- 不要引入 moment.js（用原生 Date 或 date-fns）
+- 不要写内联样式（用 Tailwind 类名）

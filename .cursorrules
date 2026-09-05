@@ -1,0 +1,77 @@
+# PC Builder Pro — Cursor 项目规则
+
+## 项目概述
+这是一个 PC 硬件选型助手网站，帮助用户 DIY 装机。核心功能：硬件选择切换、多平台价格监控、预算配置推荐、兼容性分析。
+用户是代码零基础，所有代码必须可运行、有注释、报错信息清晰。
+
+## 技术栈（严格遵守，不要擅自替换）
+- 框架：Next.js 14+ App Router，TypeScript
+- UI：shadcn/ui + Tailwind CSS，深色主题
+- 数据库：SQLite（开发）/ PostgreSQL（生产），Prisma ORM
+- 图表：Recharts
+- 图标：lucide-react
+- 爬虫：Python + Playwright（独立目录 /crawler）
+- 包管理：pnpm
+
+## 目录结构约定
+```
+src/
+  app/                    # 页面和API路由
+    page.tsx              # 首页
+    builder/page.tsx      # 装机选择器
+    recommend/page.tsx    # 预算推荐
+    prices/page.tsx       # 价格监控
+    hardware/[id]/page.tsx # 硬件详情
+    api/                  # API路由
+  components/             # 可复用组件
+  lib/                    # 工具函数（compatibility.ts, power.ts, prisma.ts）
+  types/                  # 类型定义
+prisma/
+  schema.prisma           # 数据库模型
+  seed.ts                 # 种子数据
+crawler/                  # Python爬虫（独立，不影响前端）
+public/                   # 静态资源
+```
+
+## 代码规范
+1. 所有组件用函数组件 + TypeScript，Props 必须定义 interface
+2. API 路由统一返回格式：{ success: boolean, data?: any, error?: { code: string, message: string } }
+3. 数据库操作必须通过 Prisma Client，禁止手写 SQL
+4. 价格单位统一用"分"（Int），展示时再除以100转元
+5. 硬件参数存在 specs JSON 字段，读取时必须做可选链和空值保护
+6. 每个文件顶部用一行注释说明这个文件的作用
+7. 不要使用 any 类型，除非明确标注原因
+8. 客户端组件用 'use client'，服务端组件尽量不用
+
+## 硬件数据规范
+- 硬件分类枚举：CPU, GPU, MOBO, RAM, SSD, HDD, PSU, CASE, COOLER, FAN
+- 每类硬件的 specs 必填字段见 .cursor/rules/03-hardware-data.mdc
+- 新增硬件型号时，specs 字段必须完整，不能缺关键参数
+- TDP 单位 W，尺寸单位 mm，频率单位 GHz，内存速度单位 MHz
+
+## 兼容性检查规则
+所有兼容性逻辑集中在 src/lib/compatibility.ts，新增检查项必须加在这个文件里。
+检查级别：fatal（必须修）、warning（建议改）、info（可选提升）。
+具体规则见 .cursor/rules/04-compatibility-rules.mdc。
+
+## UI 风格
+- 深色主题：背景 #0a0e1a → #111827 渐变，卡片 #1e293b，边框 #334155
+- 主色调：青色 #06b6d4，辅助色：紫色 #8b5cf6
+- 圆角 12px，卡片 hover 时边框变青色
+- 所有交互元素有明确的 hover/active 状态
+- 响应式：移动端单列，平板双列，桌面端左右布局
+- 具体见 .cursor/rules/05-ui-style.mdc
+
+## 工作流程
+1. 写代码前先确认相关文件是否已存在，优先复用已有组件
+2. 新增功能先写类型定义，再写组件，最后接API
+3. 每完成一个功能，必须能在浏览器中验证通过
+4. 遇到报错先看完整错误信息，定位到具体文件和行号再修
+5. 不要一次性生成太多文件，一次专注一个功能模块
+
+## 禁止事项
+- 不要编造硬件参数，不确定的参数标注 TODO 并提醒用户核实
+- 不要生成假的价格数据，价格必须来自爬虫或明确标注为"参考价"
+- 不要引入技术栈之外的新依赖，除非先说明理由
+- 不要跳过错误处理，API调用必须有 loading 和 error 状态
+- 不要把密钥写在代码里，统一用环境变量

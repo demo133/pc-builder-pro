@@ -1,0 +1,98 @@
+---
+description: 调试排错规则，遇到报错按此流程处理
+alwaysApply: true
+---
+
+# 调试排错规则
+
+> 针对代码零基础用户优化的调试流程
+
+## 核心原则
+报错不可怕，可怕的是不看报错就瞎改。每次报错先完整阅读错误信息，再动手。
+
+## 报错处理四步走
+
+### 第1步：读完整报错
+- 错误类型（TypeError / ReferenceError / SyntaxError / 404 / 500）
+- 错误信息（具体说了什么）
+- 文件路径和行号（哪个文件哪一行）
+- 调用栈（从下往上读，找到你自己写的代码）
+
+### 第2步：定位原因
+| 错误类型 | 常见原因 | 解决方向 |
+|---------|---------|---------|
+| Module not found | import路径错了或包没装 | 检查路径，pnpm install |
+| xxx is not a function | 函数名拼错或版本不对 | 查文档确认API |
+| Cannot read properties of undefined | 数据没加载就访问了 | 加可选链 ?. 或 loading 判断 |
+| SyntaxError | 括号/引号不匹配，语法错 | 看行号附近的代码 |
+| Prisma 报错 | 数据库没迁移或schema变了 | 跑 npx prisma migrate dev |
+| 端口被占 | 3000端口有其他程序 | pnpm dev -p 3001 |
+| 500 Internal Server Error | API里抛异常了 | 看终端里的完整报错 |
+
+### 第3步：修复
+- 一次只改一个地方，改完就运行看效果
+- 不要同时改5个地方，否则不知道哪个修好了
+- 改完不生效就重启 dev server（Ctrl+C 再 pnpm dev）
+
+### 第4步：验证
+- 修复后在浏览器里实际操作验证
+- 不要只看代码"觉得对了"，必须跑起来看
+- 相关功能也顺便测一下，防止修了这个坏了那个
+
+## 常用命令速查
+
+### 数据库相关
+```bash
+npx prisma migrate dev   # schema改了必须跑这个
+npx prisma generate      # 改了schema后类型没更新时跑
+npx prisma studio        # 可视化查看数据库数据
+npx tsx prisma/seed.ts   # 重新导入种子数据
+```
+
+### 依赖相关
+```bash
+pnpm install              # 装所有依赖
+pnpm add 包名             # 装新包
+pnpm add -D 包名          # 装开发依赖
+# 依赖出问题时清了重装（Windows）：
+# 删除 node_modules 和 .next 文件夹后 pnpm install
+```
+
+### 开发服务器
+```bash
+pnpm dev                  # 启动开发服务器
+pnpm build                # 构建生产版本
+pnpm start                # 运行生产版本
+pnpm dev -p 3001          # 换端口启动
+```
+
+## 让AI帮忙调试的正确姿势
+
+### 错误做法
+"代码报错了，帮我修"（不说什么错）
+
+### 正确做法
+把完整报错信息复制粘贴，加上上下文：
+```
+我运行 pnpm dev 时报了以下错误：
+[粘贴完整报错，包括文件路径和行号]
+
+相关文件是 src/app/builder/page.tsx，我刚改了硬件选择逻辑。
+帮我分析原因并修复。
+```
+
+## 回退方案
+如果改了一堆东西跑不起来了：
+```bash
+git status                    # 看改了哪些文件
+git diff                      # 看具体改了什么
+git checkout -- 文件名         # 放弃某个文件的改动
+git reset --hard HEAD~1       # 回退到上一个commit（会丢失改动，慎用）
+```
+
+## 预防措施
+- 每完成一个功能就运行验证，不要攒到最后
+- 每完成一个阶段就 git commit，改坏了能回退
+- 改数据库 schema 后立刻跑 migrate，不要攒一堆变更
+- 引入新依赖后立刻验证能不能 import
+- 不要同时开多个 dev server 占同一个端口

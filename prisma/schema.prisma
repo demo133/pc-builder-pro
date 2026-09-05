@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Hardware {
+  id        Int      @id @default(autoincrement())
+  category  String
+  brand     String
+  model     String
+  fullName  String
+  specs     String
+  tdp       Int?
+  msrp      Int?
+  status    String   @default("active")
+  prices    Price[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@index([brand])
+}
+
+model Price {
+  id            Int      @id @default(autoincrement())
+  hardwareId    Int
+  hardware      Hardware @relation(fields: [hardwareId], references: [id], onDelete: Cascade)
+  platform      String
+  shopName      String
+  productUrl    String
+  price         Int
+  originalPrice Int?
+  inStock       Boolean  @default(true)
+  crawledAt     DateTime @default(now())
+  createdAt     DateTime @default(now())
+
+  @@index([hardwareId])
+  @@index([crawledAt])
+  @@index([platform])
+}
+
+model PresetConfig {
+  id          Int      @id @default(autoincrement())
+  name        String
+  budgetMin   Int
+  budgetMax   Int
+  useCase     String
+  priority    String
+  components  String
+  totalPrice  Int
+  description String?
+  source      String?
+  sourceUrl   String?
+  isVerified  Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([useCase])
+  @@index([budgetMin, budgetMax])
+}
+
+model CompatibilityRule {
+  id         Int      @id @default(autoincrement())
+  ruleType   String
+  categoryA  String
+  categoryB  String?
+  condition  String
+  severity   String
+  message    String
+  suggestion String?
+  enabled    Boolean  @default(true)
+  createdAt  DateTime @default(now())
+}
+
+model CrawlTask {
+  id            Int       @id @default(autoincrement())
+  hardwareId    Int
+  platform      String
+  status        String    @default("pending")
+  lastSuccessAt DateTime?
+  lastError     String?
+  retryCount    Int       @default(0)
+  nextRunAt     DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@index([hardwareId])
+  @@index([status])
+}

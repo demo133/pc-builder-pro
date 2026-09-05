@@ -1,0 +1,157 @@
+---
+description: 硬件数据specs字段规范，录入和读取硬件数据时必须遵循
+alwaysApply: true
+globs:
+  - "prisma/seed.ts"
+  - "**/hardware*.ts"
+  - "**/hardware*.tsx"
+---
+
+# 硬件数据 Specs 字段规范
+
+所有硬件的详细参数存在 Hardware 表的 specs JSON 字段中。以下是每类硬件的必填字段。
+
+## CPU
+```json
+{
+  "socket": "LGA1700",
+  "cores": 14,
+  "threads": 20,
+  "baseClock": 3.5,
+  "boostClock": 5.3,
+  "cache": "24MB",
+  "memoryType": ["DDR4", "DDR5"],
+  "maxMemorySpeed": 5600,
+  "hasGraphics": false,
+  "manufacturer": "Intel"
+}
+```
+- socket 取值：LGA1700（Intel 12/13/14代）、AM5（AMD 7000系）、AM4（AMD 5000系）
+- hasGraphics：带核显为 true（如 i5-14600、R7 7800G），无核显为 false（如 i5-14600KF、R7 7700X）
+
+## GPU（显卡）
+```json
+{
+  "chipset": "RTX 4070 Super",
+  "vram": "12GB",
+  "vramType": "GDDR6X",
+  "bitWidth": 192,
+  "length": 300,
+  "height": 135,
+  "slots": 2.5,
+  "powerConnector": "12VHPWR",
+  "tdp": 220,
+  "manufacturer": "NVIDIA"
+}
+```
+- length/height 单位 mm，用于检查机箱限长限高
+- powerConnector：12VHPWR（RTX 40系）、8pin（RTX 30系/AMD）、6pin（老卡）
+
+## 主板（MOBO）
+```json
+{
+  "socket": "LGA1700",
+  "chipset": "B760",
+  "formFactor": "ATX",
+  "memoryType": "DDR5",
+  "memorySlots": 4,
+  "maxMemory": 192,
+  "m2Slots": 3,
+  "sataPorts": 4,
+  "pcieX16": 1,
+  "wifi": true,
+  "manufacturer": "华硕"
+}
+```
+- formFactor：ATX、Micro-ATX、Mini-ITX
+- memoryType：DDR4 或 DDR5（注意：LGA1700 主板有 DDR4 和 DDR5 两种版本）
+
+## 内存（RAM）
+```json
+{
+  "type": "DDR5",
+  "capacity": "32GB",
+  "modules": "2x16GB",
+  "moduleCount": 2,
+  "speed": 6000,
+  "casLatency": "CL30",
+  "voltage": 1.35,
+  "rgb": true,
+  "height": 42
+}
+```
+- moduleCount 用于检查是否超过主板内存插槽数
+- height 单位 mm，用于检查散热器是否挡内存
+
+## SSD（固态硬盘）
+```json
+{
+  "capacity": "1TB",
+  "interface": "PCIe 4.0 x4",
+  "protocol": "NVMe",
+  "formFactor": "M.2 2280",
+  "readSpeed": 7000,
+  "writeSpeed": 6000,
+  "tbw": 600,
+  "nandType": "TLC"
+}
+```
+- formFactor：M.2 2280（最常见）、M.2 22110、2.5英寸（SATA）
+- M.2 接口的 SSD 需要占用主板 M.2 插槽
+
+## 电源（PSU）
+```json
+{
+  "wattage": 750,
+  "certification": "80+ Gold",
+  "modular": "全模组",
+  "formFactor": "ATX",
+  "atxVersion": "ATX 3.0",
+  "pcieConnectors": 2,
+  "warranty": "10年"
+}
+```
+- certification：80+ White / Bronze / Silver / Gold / Platinum / Titanium
+- modular：全模组 / 半模组 / 非模组
+- wattage 是额定功率，不是峰值
+
+## 机箱（CASE）
+```json
+{
+  "formFactor": ["ATX", "Micro-ATX", "Mini-ITX"],
+  "maxGpuLength": 360,
+  "maxCoolerHeight": 165,
+  "maxPsuLength": 200,
+  "driveBays": 2,
+  "fansPreinstalled": 3,
+  "maxFans": 6,
+  "radiatorSupport": "360mm",
+  "temperedGlass": true
+}
+```
+- maxGpuLength / maxCoolerHeight 是兼容性检查的关键字段
+
+## 散热器（COOLER）
+```json
+{
+  "type": "风冷",
+  "tdpRating": 250,
+  "height": 155,
+  "sockets": ["LGA1700", "AM5", "AM4"],
+  "fans": 1,
+  "noise": 28,
+  "rgb": false
+}
+```
+- type：风冷 / 水冷
+- tdpRating 必须 >= CPU TDP，否则警告
+- sockets 列表必须包含 CPU 的 socket，否则不兼容
+
+## 数据录入检查清单
+新增硬件时逐项确认：
+- [ ] category 正确
+- [ ] brand 和 model 准确
+- [ ] tdp 字段填写（CPU/GPU/PSU 必须有）
+- [ ] specs 中所有必填字段完整
+- [ ] 尺寸类字段单位正确（mm）
+- [ ] 价格数据中 product_url 有效

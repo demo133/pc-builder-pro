@@ -1,0 +1,82 @@
+---
+description: 防幻觉规则，防止AI编造不存在的API、组件、硬件参数和功能
+alwaysApply: true
+---
+
+# 防幻觉安全规则
+
+> 来源：提炼自 n0rvyn/cursor-rules、PatrickJS/awesome-cursorrules 的 Next.js 安全规则集
+
+## 核心原则
+**不确定就问，不要编。** 代码零基础用户无法分辨你写的是真是假，编造的内容会导致他浪费大量时间调试。
+
+## 禁止编造
+
+### 1. 禁止编造硬件参数
+- 写种子数据或硬件信息时，只使用明确知道的真实参数
+- 不确定的参数（TDP、尺寸、插槽）必须标注 `// TODO: 待核实`，不要瞎填
+- 禁止生成不存在的硬件型号（如"RTX 4090 Ti"在未发布前不能写）
+- 如果用户要求录入某款硬件但你不确定参数，明确说"我不确定这款的具体参数，建议去京东/官网核实"
+
+### 2. 禁止编造 shadcn/ui 组件
+- 使用 shadcn/ui 组件前，确认该组件确实存在（Button、Card、Dialog、Input、Select、Slider、Tabs、Badge、Tooltip、Skeleton、Table、Progress）
+- 不存在的组件：不要写 `<DataGrid>`、`<Chart>` 等 shadcn/ui 没有的组件
+- 图表用 Recharts，不要用 shadcn/ui 的图表组件（不存在）
+- 如果需要某个组件但不确定有没有，先查 `src/components/ui/` 目录
+
+### 3. 禁止编造 Next.js API
+- 不要使用不存在的 Next.js API 或已废弃的写法
+- App Router 用 `app/api/[route]/route.ts`，不要用 Pages Router 的 `pages/api/`
+- 服务端组件默认是 async，不要随便加 `'use client'`
+- 数据获取优先用 Server Components，不要默认用 useEffect + fetch
+
+### 4. 禁止编造 Prisma 方法
+- 只使用标准 Prisma 方法：findMany、findUnique、findFirst、create、update、delete、count、aggregate
+- 关联查询用 `include` 或 `select`，不要编其他方法
+- SQLite 不支持枚举类型，schema 里用 String 代替
+
+### 5. 禁止编造依赖包
+- 不要 import 没有安装的包
+- 引入新依赖前必须说明：包名、用途、为什么需要
+-  package.json 里没有的依赖，先让用户安装再用
+
+## 验证要求
+
+### 写代码前
+- 引用其他文件时，先确认该文件存在
+- 使用组件时，先确认 `src/components/ui/` 下有这个组件
+- 使用工具函数时，先确认 `src/lib/` 下有这个文件
+
+### 写代码后
+- 检查所有 import 路径是否正确
+- 检查使用的组件/函数是否真实存在
+- 检查硬件参数是否有 TODO 标注
+
+### 遇到不确定时
+- 明确告诉用户"这个我不确定，建议核实"
+- 给出核实方法（去哪个网站查、查什么参数）
+- 不要用"大概""应该""可能"来掩盖不确定
+
+## 反例（禁止这样做）
+```tsx
+// ❌ 编造不存在的组件
+import { DataTable } from '@/components/ui/data-table'  // shadcn/ui没有这个
+
+// ❌ 编造硬件参数
+{ tdp: 250, socket: "LGA1800" }  // LGA1800不存在
+
+// ❌ 编造API
+import { useHardware } from '@/hooks/use-hardware'  // 文件不存在
+```
+
+## 正例
+```tsx
+// ✅ 用真实存在的组件
+import { Table, TableBody, TableCell, TableRow } from '@/components/ui/table'
+
+// ✅ 不确定的参数标注TODO
+{ tdp: 125, socket: "LGA1700", boostClock: 5.3 /* TODO: 核实准确频率 */ }
+
+// ✅ 引用前确认文件存在
+// 先检查 src/lib/prisma.ts 是否存在，再 import
+```

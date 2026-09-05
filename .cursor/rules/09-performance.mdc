@@ -1,0 +1,72 @@
+---
+description: 性能优化规则，确保网站加载快、交互流畅
+alwaysApply: true
+globs:
+  - "**/*.tsx"
+  - "**/api/**"
+---
+
+# 性能优化规则
+
+> 来源：提炼自社区热门 cursorrules 的 Next.js 性能最佳实践
+
+## 页面加载
+- 首屏加载目标 < 2 秒
+- 图片用 Next.js 的 `<Image>` 组件，不要用原生 `<img>`
+- 图片放在 `/public` 目录，设置 `width` 和 `height` 避免布局偏移
+- 大图片先压缩，单张不超过 200KB
+- 图标用 lucide-react，不要用图片图标
+
+## 数据获取
+- 优先用 Server Components 获取数据，不要在客户端 useEffect 里 fetch
+- 列表查询加分页，不要一次性查全表
+- 价格查询只取最新一条（`orderBy: { crawledAt: 'desc' }, take: 1`），不要把所有历史价格都查出来
+- 硬件列表用 `select` 只取需要的字段，不要把 specs 大 JSON 全查出来再丢弃
+
+```tsx
+// ✅ 正确：服务端组件直接查
+export default async function BuilderPage() {
+  const hardware = await prisma.hardware.findMany({
+    where: { category: 'CPU' },
+    select: { id: true, brand: true, model: true, tdp: true },
+    take: 50,
+  })
+  return <HardwareList data={hardware} />
+}
+
+// ❌ 错误：客户端fetch + 全量查询
+'use client'
+const [data, setData] = useState([])
+useEffect(() => {
+  fetch('/api/hardware').then(r => r.json()).then(setData)
+}, [])
+```
+
+## 渲染性能
+- 大列表用虚拟滚动（数据超过100条时）
+- 不要在渲染过程中做复杂计算（兼容性检查可以用 useMemo 缓存）
+- 弹窗/抽屉内容懒加载，不要一开始就渲染所有硬件选择面板
+- 避免不必要的重渲染：状态提升到合理的层级，不要全放根组件
+
+## API 性能
+- 数据库查询加索引（Prisma schema 中用 `@@index`）
+- 常用查询字段加索引：hardware.category、prices.hardwareId、prices.crawledAt
+- 价格历史查询限制天数（默认30天），不要查全部历史
+- API 响应加缓存头（`Cache-Control`），不常变的数据缓存
+
+## 包体积
+- 不要全量引入第三方库，用按需导入
+- Recharts 只导入用到的图表组件（LineChart, PieChart）
+- 日期处理用原生 Date，不要引入 moment.js
+- 定期检查 `pnpm build` 输出的 bundle 大小
+
+## 数据库
+- SQLite 开发阶段够用，上线后用 PostgreSQL
+- 价格表数据量大时考虑分表（当前价格表 + 历史价格表）
+- 定期清理过期的爬取日志
+- 不要在循环里做数据库查询（N+1 问题），用 include 一次查出来
+
+## 监控
+- 关键操作加 console.log（开发环境），方便排查
+- API 错误必须有 try-catch，返回友好错误信息
+- 爬虫记录成功/失败数量和耗时

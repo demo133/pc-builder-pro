@@ -1,0 +1,82 @@
+---
+description: Git工作流和commit message规范，每次提交代码时遵循
+alwaysApply: true
+---
+
+# Git 工作流规则
+
+> 来源：提炼自社区热门 cursorrules 仓库的 Git 规范
+
+## 分支策略
+- `main`：主分支，始终保持可运行状态
+- 开发直接在 main 上进行（个人项目，不需要复杂分支）
+- 做大改动前先 commit 当前状态，改坏了能回退
+
+## Commit Message 规范
+
+### 格式
+```
+<type>(<scope>): <简短描述>
+
+<可选：详细说明>
+```
+
+### type 类型
+| type | 用途 | 示例 |
+|------|------|------|
+| `feat` | 新功能 | feat(builder): 添加硬件选择弹窗 |
+| `fix` | 修复bug | fix(prices): 修复价格单位显示错误 |
+| `style` | 样式调整（不影响逻辑） | style(ui): 优化卡片hover效果 |
+| `refactor` | 重构（不改变功能） | refactor(lib): 抽离兼容性检查函数 |
+| `docs` | 文档 | docs: 更新README安装说明 |
+| `chore` | 构建/依赖/配置 | chore: 添加recharts依赖 |
+| `perf` | 性能优化 | perf(api): 硬件列表查询加缓存 |
+| `data` | 数据更新 | data: 新增5款RTX40系列显卡 |
+
+### scope（可选）
+影响的模块：builder、prices、recommend、api、lib、ui、prisma、crawler
+
+### 描述要求
+- 用中文，简洁明了，不超过50字
+- 用动词开头：添加、修复、优化、重构、更新
+- 不要写"修改了一些东西""更新代码"这种无意义描述
+
+### 好的示例
+```
+feat(builder): 实现8类硬件选择切换和实时总价计算
+fix(compatibility): 修复AMD CPU与主板插槽检查逻辑
+style(global): 深色主题配色调整为青色主色调
+data(seed): 新增i5-14600KF等10款CPU数据
+chore: 初始化Next.js项目和依赖
+```
+
+### 差的示例（禁止）
+```
+更新
+修改
+fix bug
+asdf
+123
+```
+
+## 提交频率
+- 每完成一个功能点就 commit 一次
+- 不要攒一堆改动才提交
+- 改坏了能 `git reset --hard` 回退到上一个commit
+- 每天结束前确保所有改动都已 commit
+
+## 常用Git命令
+```bash
+git status                    # 查看改动
+git add .                     # 暂存所有改动
+git commit -m "feat: xxx"     # 提交
+git log --oneline -10         # 查看最近10条提交
+git diff                      # 查看具体改了什么
+git reset --hard HEAD~1       # 回退到上一个commit（慎用，会丢失改动）
+```
+
+## 不要做
+- 不要把 node_modules、.env、.next 提交到 git（.gitignore 已排除）
+- 不要提交包含密钥、密码、API Key 的文件
+- 不要在 commit message 里写脏话或无意义内容
+- 不要 force push 到 main（个人项目无所谓，但养成好习惯）
