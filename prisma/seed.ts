@@ -152,90 +152,90 @@ const presetConfigs = [
   },
 ]
 
-function jdPrice(msrpYuan: number, variance = 0.05): number {
-  // 京东参考价 = msrp * (0.95 ~ 1.05)，单位分
-  const factor = 1 + (Math.random() * 2 - 1) * variance
+function jdPrice(msrpYuan: number): number {
+  const factor = 0.95 + Math.random() * 0.1
   return Math.round(msrpYuan * factor) * 100
 }
 
 async function main() {
   console.log("开始清空旧数据...")
   await prisma.price.deleteMany()
+  await prisma.crawlTask.deleteMany()
   await prisma.hardware.deleteMany()
   await prisma.presetConfig.deleteMany()
-  await prisma.crawlTask.deleteMany()
 
-  console.log(`开始导入 ${hardwareData.length} 款硬件...`)
-  let priceCount = 0
-  for (const hw of hardwareData) {
-    const created = await prisma.hardware.create({ data: hw })
-    // 每款硬件添加1-2条京东价
-    const priceCountForHw = Math.random() > 0.5 ? 2 : 1
-    for (let i = 0; i < priceCountForHw; i++) {
-      const price = jdPrice(hw.msrp || 1000)
-      const keyword = `${hw.brand} ${hw.model}`
-      await prisma.price.create({
-        data: {
-          hardwareId: created.id,
-          platform: "jd",
-          shopName: "京东参考价",
-          productUrl: `https://search.jd.com/Search?keyword=${encodeURIComponent(keyword)}`,
-          price,
-          originalPrice: Math.round(price * 1.1),
-          inStock: true,
-          crawledAt: new Date(),
-        },
-      })
-      priceCount++
-    }
-    // 添加一条天猫参考价（京东价 * 0.97）
-    const jdPriceVal = jdPrice(hw.msrp || 1000)
-    const tmallPrice = Math.floor((jdPriceVal * 0.97) / 100) * 100
+  console.log(`批量创建 ${hardwareData.length} 款硬件...`)
+  // PostgreSQL createMany 支持 returning 返回ID
+  const createdHardware = await prisma.hardware.createMany({
+    data: hardwareData,
+  })
+  console.log(`  硬件创建完成: ${createdHardware.count} 款`)
+
+  // 查询所有硬件获取ID
+  const allHardware = await prisma.hardware.findMany({ select: { id: true, brand: true, model: true, msrp: true } })
+  console.log(`  获取到 ${allHardware.length} 个硬件ID`)
+
+  // 批量创建价格
+  console.log("批量创建价格记录...")
+  const priceData: any[] = []
+  for (const hw of allHardware) {
+    const msrp = hw.msrp || 1000
+    // 京东价
+    const jd = jdPrice(msrp)
     const keyword = `${hw.brand} ${hw.model}`
-    await prisma.price.create({
-      data: {
-        hardwareId: created.id,
-        platform: "tmall",
-        shopName: "天猫参考价",
-        productUrl: `https://list.tmall.com/search_product.htm?q=${encodeURIComponent(keyword)}`,
-        price: tmallPrice,
-        originalPrice: Math.round(tmallPrice * 1.1),
-        inStock: true,
-        crawledAt: new Date(),
-      },
+    priceData.push({
+      hardwareId: hw.id,
+      platform: "jd",
+      shopName: "京东参考价",
+      productUrl: `https://search.jd.com/Search?keyword=${encodeURIComponent(keyword)}`,
+      price: jd,
+      originalPrice: Math.round(jd * 1.1),
+      inStock: true,
+      crawledAt: new Date(),
     })
-    priceCount++
-    console.log(`  ✓ ${hw.category} ${hw.brand} ${hw.model}`)
+    // 天猫价（京东价 * 0.97）
+    const tmall = Math.floor((jd * 0.97) / 100) * 100
+    priceData.push({
+      hardwareId: hw.id,
+      platform: "tmall",
+      shopName: "天猫参考价",
+      productUrl: `https://list.tmall.com/search_product.htm?q=${encodeURIComponent(keyword)}`,
+      price: tmall,
+      originalPrice: Math.round(tmall * 1.1),
+      inStock: true,
+      crawledAt: new Date(),
+    })
   }
+  await prisma.price.createMany({ data: priceData })
+  console.log(`  价格创建完成: ${priceData.length} 条`)
 
-  console.log(`\n开始导入 ${presetConfigs.length} 套预置配置...`)
-  for (const config of presetConfigs) {
-    await prisma.presetConfig.create({ data: config })
-    console.log(`  ✓ ${config.name}`)
-  }
+  // 批量创建预置配置
+  console.log("批量创建预置配置...")
+  await prisma.presetConfig.createMany({ data: presetConfigs })
+  console.log(`  配置创建完成: ${presetConfigs.length} 套`)
 
-  // 创建爬取任务
-  console.log("\n创建爬取任务...")
-  const allHardware = await prisma.hardware.findMany()
+  // 批量创建爬取任务
+  console.log("批量创建爬取任务...")
+  const crawlData: any[] = []
   for (const hw of allHardware) {
     for (const platform of ["jd", "tmall"]) {
-      await prisma.crawlTask.create({
-        data: {
-          hardwareId: hw.id,
-          platform,
-          status: "success",
-          lastSuccessAt: new Date(),
-          nextRunAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        },
+      crawlData.push({
+        hardwareId: hw.id,
+        platform,
+        status: "success",
+        lastSuccessAt: new Date(),
+        nextRunAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
       })
     }
   }
+  await prisma.crawlTask.createMany({ data: crawlData })
+  console.log(`  爬取任务创建完成: ${crawlData.length} 个`)
 
-  console.log(`\n完成！`)
+  console.log("\n全部完成！")
   console.log(`  硬件: ${hardwareData.length} 款`)
-  console.log(`  价格: ${priceCount} 条`)
+  console.log(`  价格: ${priceData.length} 条`)
   console.log(`  配置: ${presetConfigs.length} 套`)
-  console.log(`  爬取任务: ${allHardware.length * 2} 个`)
+  console.log(`  爬取任务: ${crawlData.length} 个`)
 }
 
 main()
