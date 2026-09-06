@@ -1,197 +1,197 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+import { Card, CardContent } from "@/components/ui/card"
 import { ScrollReveal } from "@/components/ScrollReveal"
 import { Counter } from "@/components/Counter"
-import { ParallaxGlow } from "@/components/ParallaxGlow"
 import {
-  Cpu,
-  Monitor,
-  DollarSign,
-  ShieldCheck,
   ArrowRight,
+  Cpu,
+  DollarSign,
   Sparkles,
-  TrendingUp,
-  CheckCircle2,
-  MousePointerClick,
+  ShieldCheck,
   Sliders,
+  MousePointerClick,
   Zap,
+  ChevronDown,
 } from "lucide-react"
 
 const FEATURES = [
   {
     icon: Cpu,
-    title: "硬件选择切换",
-    desc: "8大硬件分类自由搭配，实时总价计算，所见即所得",
-    color: "cyan",
-    href: "/builder",
+    title: "硬件选择",
+    desc: "8大硬件分类自由搭配，实时总价计算",
   },
   {
     icon: DollarSign,
-    title: "实时价格监控",
-    desc: "京东天猫价格对比，历史价格曲线，帮你判断最佳入手时机",
-    color: "emerald",
-    href: "/prices",
+    title: "价格监控",
+    desc: "京东天猫双平台价格对比，一键跳转",
   },
   {
     icon: Sparkles,
-    title: "预算配置推荐",
-    desc: "输入预算和用途，智能推荐最优配置方案，小白也不踩坑",
-    color: "violet",
-    href: "/recommend",
-  },
-  {
-    icon: ShieldCheck,
-    title: "兼容性分析",
-    desc: "15项兼容性检查，0-100分评分，高U低显一键识别",
-    color: "amber",
-    href: "/builder",
-  },
-]
-
-const STEPS = [
-  {
-    icon: Sliders,
-    title: "设定预算",
-    desc: "输入你的预算金额和主要用途",
-  },
-  {
-    icon: MousePointerClick,
-    title: "选择硬件",
-    desc: "从8大分类中挑选心仪硬件",
+    title: "智能推荐",
+    desc: "输入预算和用途，推荐最优配置方案",
   },
   {
     icon: ShieldCheck,
     title: "兼容性检测",
-    desc: "系统自动检查配置是否合理",
-  },
-  {
-    icon: Zap,
-    title: "一键装机",
-    desc: "导出配置清单，直接下单购买",
+    desc: "15项检查，0-100分评分，高U低显一键识别",
   },
 ]
 
-const colorMap: Record<string, string> = {
-  cyan: "bg-cyan-500/10 text-cyan-400",
-  emerald: "bg-emerald-500/10 text-emerald-400",
-  violet: "bg-violet-500/10 text-violet-400",
-  amber: "bg-amber-500/10 text-amber-400",
-}
+const STEPS = [
+  { icon: Sliders, title: "设定预算", desc: "输入预算金额和主要用途" },
+  { icon: MousePointerClick, title: "选择硬件", desc: "从8大分类中挑选心仪硬件" },
+  { icon: ShieldCheck, title: "兼容性检测", desc: "系统自动检查配置是否合理" },
+  { icon: Zap, title: "一键装机", desc: "导出配置清单，直接下单购买" },
+]
+
+const CONFIGS = [
+  {
+    name: "办公主机",
+    price: "¥3,033",
+    desc: "i5-14400 核显方案",
+    tag: "3000元",
+  },
+  {
+    name: "游戏主机",
+    price: "¥5,932",
+    desc: "R5 7500F + RTX 4060",
+    tag: "6000元",
+  },
+  {
+    name: "高端游戏",
+    price: "¥10,282",
+    desc: "7800X3D + RTX 4070 Super",
+    tag: "10000元",
+  },
+]
 
 export default function Home() {
   return (
-    <div className="min-h-screen">
-      {/* Hero区域 */}
-      <section className="relative overflow-hidden">
-        {/* 视差背景光晕 */}
-        <ParallaxGlow />
-
-        <div className="relative mx-auto max-w-6xl px-4 py-24 text-center">
-          <div className="animate-fade-in-up mb-6 inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-1.5 text-sm text-cyan-400">
-            <Monitor className="h-4 w-4" />
+    <div className="min-h-screen bg-white text-black">
+      {/* Hero - 苹果风格大标题 */}
+      <section className="relative overflow-hidden bg-white">
+        <div className="mx-auto max-w-5xl px-6 pt-24 pb-32 text-center">
+          <div className="animate-fade-in-up mb-6 inline-flex items-center gap-2 rounded-full bg-black/5 px-4 py-1.5 text-sm font-medium text-black/60">
             DIY 装机，从这里开始
           </div>
-          <h1 className="animate-fade-in-up delay-100 mb-6 text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
-            专业的 <span className="gradient-text">PC 硬件</span> 选型助手
+          <h1 className="animate-fade-in-up delay-100 headline-xl mb-6 text-black">
+            专业的 PC 硬件
+            <br />
+            <span className="gradient-text">选型助手</span>
           </h1>
-          <p className="animate-fade-in-up delay-200 mx-auto mb-10 max-w-2xl text-lg text-slate-400">
-            智能兼容性检查、实时价格监控、预算配置推荐——让每一分钱都花在刀刃上
+          <p className="animate-fade-in-up delay-200 mx-auto mb-10 max-w-xl text-lg text-black/50">
+            智能兼容性检查、实时价格监控、预算配置推荐
+            <br />
+            让每一分钱都花在刀刃上
           </p>
           <div className="animate-fade-in-up delay-300 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Button asChild size="lg" className="bg-cyan-500 hover:bg-cyan-600 hover:shadow-lg hover:shadow-cyan-500/25">
+            <Button
+              asChild
+              size="lg"
+              className="rounded-full bg-black px-8 text-white hover:bg-black/80 hover:shadow-lg hover:shadow-black/10"
+            >
               <Link href="/builder">
                 开始装机
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="hover:bg-slate-800">
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="rounded-full border-black/10 bg-white px-8 text-black hover:bg-black/5"
+            >
               <Link href="/recommend">按预算推荐</Link>
             </Button>
           </div>
 
-          {/* 数据统计 - 数字计数动画 */}
-          <div className="animate-fade-in-up delay-400 mx-auto mt-16 grid max-w-3xl grid-cols-3 gap-8">
-            <div>
-              <div className="text-3xl font-bold text-white">
-                <Counter end={88} suffix="+" />
-              </div>
-              <div className="mt-1 text-sm text-slate-400">硬件型号</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-white">
-                <Counter end={15} />
-              </div>
-              <div className="mt-1 text-sm text-slate-400">兼容性检查项</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold text-white">
-                <Counter end={3} />
-              </div>
-              <div className="mt-1 text-sm text-slate-400">预置配置方案</div>
-            </div>
+          {/* 向下滚动提示 */}
+          <div className="animate-fade-in-up delay-500 mt-20 flex justify-center">
+            <ChevronDown className="h-6 w-6 animate-bounce text-black/30" />
           </div>
         </div>
       </section>
 
-      {/* 核心功能 */}
-      <section className="mx-auto max-w-6xl px-4 py-16">
-        <ScrollReveal>
-          <div className="mb-10 text-center">
-            <h2 className="text-2xl font-bold text-white">核心功能</h2>
-            <p className="mt-2 text-sm text-slate-400">四大核心能力，覆盖装机全流程</p>
-          </div>
-        </ScrollReveal>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {FEATURES.map((feature, index) => {
-            const Icon = feature.icon
-            return (
-              <ScrollReveal key={feature.title} delay={index * 100}>
-                <Link href={feature.href}>
-                  <Card className="card-hover h-full border-slate-700 bg-slate-800/50">
-                    <CardHeader>
-                      <div className={`mb-3 flex h-10 w-10 items-center justify-center rounded-lg ${colorMap[feature.color]}`}>
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <CardTitle className="text-white">{feature.title}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="text-sm text-slate-400">
-                      {feature.desc}
-                    </CardContent>
-                  </Card>
-                </Link>
-              </ScrollReveal>
-            )
-          })}
+      {/* 数据统计 - 极简数字 */}
+      <section className="border-y border-black/5 bg-[#f5f5f7]">
+        <div className="mx-auto grid max-w-4xl grid-cols-3 divide-x divide-black/5">
+          {[
+            { num: 88, suffix: "+", label: "硬件型号" },
+            { num: 15, suffix: "", label: "兼容性检查" },
+            { num: 3, suffix: "", label: "预置方案" },
+          ].map((item, i) => (
+            <div key={i} className="px-6 py-16 text-center">
+              <div className="headline-lg text-black">
+                <Counter end={item.num} suffix={item.suffix} />
+              </div>
+              <div className="mt-2 text-sm text-black/50">{item.label}</div>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* 使用流程 */}
-      <section className="border-y border-slate-700/50 bg-slate-900/30">
-        <div className="mx-auto max-w-6xl px-4 py-16">
+      {/* 核心功能 - 大卡片 */}
+      <section className="bg-white py-24">
+        <div className="mx-auto max-w-6xl px-6">
           <ScrollReveal>
-            <div className="mb-10 text-center">
-              <h2 className="text-2xl font-bold text-white">四步完成装机</h2>
-              <p className="mt-2 text-sm text-slate-400">简单流程，小白也能轻松上手</p>
+            <div className="mb-16 text-center">
+              <h2 className="headline-lg mb-4 text-black">四大核心能力</h2>
+              <p className="text-black/50">覆盖装机全流程</p>
             </div>
           </ScrollReveal>
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-6 sm:grid-cols-2">
+            {FEATURES.map((feature, index) => {
+              const Icon = feature.icon
+              return (
+                <ScrollReveal key={feature.title} delay={index * 100}>
+                  <Link href={index % 2 === 0 ? "/builder" : "/recommend"}>
+                    <Card className="card-hover h-full border-0 bg-[#f5f5f7] shadow-none">
+                      <CardContent className="p-10">
+                        <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-black text-white">
+                          <Icon className="h-6 w-6" />
+                        </div>
+                        <h3 className="mb-2 text-xl font-semibold text-black">
+                          {feature.title}
+                        </h3>
+                        <p className="text-black/50">{feature.desc}</p>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                </ScrollReveal>
+              )
+            })}
+          </div>
+        </div>
+      </section>
+
+      {/* 使用流程 - 横向步骤 */}
+      <section className="bg-[#f5f5f7] py-24">
+        <div className="mx-auto max-w-6xl px-6">
+          <ScrollReveal>
+            <div className="mb-16 text-center">
+              <h2 className="headline-lg mb-4 text-black">四步完成装机</h2>
+              <p className="text-black/50">简单流程，小白也能轻松上手</p>
+            </div>
+          </ScrollReveal>
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {STEPS.map((step, index) => {
               const Icon = step.icon
               return (
                 <ScrollReveal key={step.title} delay={index * 100}>
                   <div className="relative">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-cyan-500/10 text-cyan-400">
+                    <div className="mb-4 flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-white">
                         <Icon className="h-5 w-5" />
                       </div>
-                      <Badge variant="outline" className="text-xs text-slate-400">
-                        步骤 {index + 1}
-                      </Badge>
+                      <span className="text-sm font-medium text-black/40">
+                        0{index + 1}
+                      </span>
                     </div>
-                    <h3 className="mt-3 font-semibold text-white">{step.title}</h3>
-                    <p className="mt-1 text-sm text-slate-400">{step.desc}</p>
+                    <h3 className="mb-1 text-lg font-semibold text-black">
+                      {step.title}
+                    </h3>
+                    <p className="text-sm text-black/50">{step.desc}</p>
                   </div>
                 </ScrollReveal>
               )
@@ -200,88 +200,73 @@ export default function Home() {
         </div>
       </section>
 
-      {/* 热门配置推荐 */}
-      <section className="mx-auto max-w-6xl px-4 py-16">
-        <ScrollReveal>
-          <div className="mb-10 flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold text-white">热门配置方案</h2>
-              <p className="mt-2 text-sm text-slate-400">经过验证的高性价比配置</p>
+      {/* 热门配置 - 三列卡片 */}
+      <section className="bg-white py-24">
+        <div className="mx-auto max-w-6xl px-6">
+          <ScrollReveal>
+            <div className="mb-16 text-center">
+              <h2 className="headline-lg mb-4 text-black">热门配置方案</h2>
+              <p className="text-black/50">经过验证的高性价比配置</p>
             </div>
-            <Button asChild variant="outline" size="sm">
-              <Link href="/recommend">
-                查看更多
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
+          </ScrollReveal>
+          <div className="grid gap-6 md:grid-cols-3">
+            {CONFIGS.map((config, index) => (
+              <ScrollReveal key={config.name} delay={index * 100}>
+                <Card className="card-hover h-full border-0 bg-[#f5f5f7] shadow-none">
+                  <CardContent className="p-8">
+                    <div className="mb-4 inline-block rounded-full bg-black px-3 py-1 text-xs font-medium text-white">
+                      {config.tag}
+                    </div>
+                    <h3 className="mb-1 text-xl font-semibold text-black">
+                      {config.name}
+                    </h3>
+                    <p className="mb-4 text-sm text-black/50">{config.desc}</p>
+                    <div className="mb-6 text-2xl font-bold text-black">
+                      {config.price}
+                    </div>
+                    <Button
+                      asChild
+                      variant="outline"
+                      className="w-full rounded-full border-black/10 hover:bg-black hover:text-white"
+                    >
+                      <Link href="/recommend">查看详情</Link>
+                    </Button>
+                  </CardContent>
+                </Card>
+              </ScrollReveal>
+            ))}
           </div>
-        </ScrollReveal>
-        <div className="grid gap-6 md:grid-cols-3">
-          {[
-            {
-              name: "3000元办公主机",
-              price: "¥3,033",
-              desc: "i5-14400核显方案，日常办公网课绰绰有余",
-              tag: "办公",
-            },
-            {
-              name: "6000元游戏主机",
-              price: "¥5,932",
-              desc: "R5 7500F + RTX 4060，1080P高画质畅玩",
-              tag: "游戏",
-            },
-            {
-              name: "10000元高端游戏",
-              price: "¥10,282",
-              desc: "7800X3D + RTX 4070 Super，2K电竞无压力",
-              tag: "高端",
-            },
-          ].map((config, index) => (
-            <ScrollReveal key={config.name} delay={index * 100}>
-              <Card className="card-hover h-full border-slate-700 bg-slate-800/50">
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between">
-                    <Badge className="bg-cyan-500/10 text-cyan-400">{config.tag}</Badge>
-                    <div className="text-xl font-bold text-emerald-400">{config.price}</div>
-                  </div>
-                  <h3 className="mt-3 font-semibold text-white">{config.name}</h3>
-                  <p className="mt-1 text-sm text-slate-400">{config.desc}</p>
-                  <Button asChild className="mt-4 w-full" size="sm" variant="outline">
-                    <Link href="/recommend">查看详情</Link>
-                  </Button>
-                </CardContent>
-              </Card>
-            </ScrollReveal>
-          ))}
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="mx-auto max-w-6xl px-4 pb-16">
-        <ScrollReveal>
-          <Card className="card-hover border-cyan-500/30 bg-gradient-to-r from-cyan-500/10 to-blue-500/10">
-            <CardContent className="flex flex-col items-center justify-between gap-4 p-8 sm:flex-row">
-              <div>
-                <h3 className="text-xl font-bold text-white">准备好开始装机了吗？</h3>
-                <p className="mt-1 text-sm text-slate-400">
-                  立即使用智能选型工具，打造属于你的完美配置
-                </p>
-              </div>
-              <Button asChild size="lg" className="bg-cyan-500 hover:bg-cyan-600 hover:shadow-lg hover:shadow-cyan-500/25">
-                <Link href="/builder">
-                  立即开始
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </CardContent>
-          </Card>
-        </ScrollReveal>
+      {/* CTA - 全屏黑色区块 */}
+      <section className="bg-black py-24">
+        <div className="mx-auto max-w-4xl px-6 text-center">
+          <ScrollReveal>
+            <h2 className="headline-lg mb-6 text-white">
+              准备好开始装机了吗？
+            </h2>
+            <p className="mb-10 text-white/50">
+              立即使用智能选型工具，打造属于你的完美配置
+            </p>
+            <Button
+              asChild
+              size="lg"
+              className="rounded-full bg-white px-8 text-black hover:bg-white/90"
+            >
+              <Link href="/builder">
+                立即开始
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </ScrollReveal>
+        </div>
       </section>
 
       {/* 底部 */}
-      <footer className="border-t border-slate-700/50 py-8 text-center text-sm text-slate-500">
-        <p>PC Builder Pro — 让 DIY 装机更简单</p>
-        <p className="mt-1 text-xs text-slate-600">价格数据仅供参考，下单前请以实际平台为准</p>
+      <footer className="border-t border-black/5 bg-[#f5f5f7] py-10 text-center text-sm text-black/40">
+        <p>PC Builder — 让 DIY 装机更简单</p>
+        <p className="mt-1 text-xs">价格数据仅供参考，下单前请以实际平台为准</p>
       </footer>
     </div>
   )
