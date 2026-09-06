@@ -68,7 +68,7 @@ const CONFIGS = [
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white text-black">
+    <div className="page-enter min-h-screen bg-white text-black">
       {/* Hero - 苹果风格大标题 */}
       <section className="relative overflow-hidden bg-white">
         <div className="mx-auto max-w-5xl px-6 pt-24 pb-32 text-center">

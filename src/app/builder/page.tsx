@@ -366,7 +366,7 @@ function BuilderPageContent() {
   }, [activeCategory])
 
   return (
-    <div className="min-h-screen bg-white pb-20">
+    <div className="page-enter min-h-screen bg-white pb-20">
       {/* 顶部固定总价栏 */}
       <div className="sticky top-[57px] z-40 border-b border-black/5 bg-white/80 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-3">

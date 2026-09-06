@@ -150,7 +150,7 @@ export default function RecommendPage() {
   }))
 
   return (
-    <div className="min-h-screen bg-white pb-20">
+    <div className="page-enter min-h-screen bg-white pb-20">
       {/* 顶部标题 */}
       <div className="border-b border-black/5 bg-white">
         <div className="mx-auto max-w-6xl px-6 py-10">
