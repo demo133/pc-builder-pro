@@ -424,12 +424,34 @@ function BuilderPageContent() {
   }
 
   const handleCompareSelect = (item: CompareHardware) => {
-    const category = pendingCompare?.[0]?.category as keyof typeof selected | undefined
+    const category = (item.category || pendingCompare?.[0]?.category) as keyof typeof selected | undefined
     if (category) {
-      const hw = hardwareList.find((h) => h.id === item.id)
-      if (hw) {
-        setSelected((prev) => ({ ...prev, [category]: hw }))
+      // 先尝试从 hardwareList 找，找不到则用 item 数据构造
+      let hw = hardwareList.find((h) => h.id === item.id)
+      if (!hw) {
+        const specs = item.specs ? JSON.parse(item.specs) : {}
+        const searchUrl = `https://search.jd.com/Search?keyword=${encodeURIComponent(item.brand + ' ' + item.model)}`
+        hw = {
+          id: item.id,
+          category: item.category,
+          brand: item.brand,
+          model: item.model,
+          fullName: item.fullName,
+          specs,
+          tdp: specs.tdp || null,
+          price: item.price ? {
+            platform: "jd",
+            shopName: "参考价",
+            productUrl: searchUrl,
+            price: item.price,
+          } : null,
+          prices: {
+            jd: { price: item.price || null, productUrl: searchUrl, shopName: "参考价" },
+            tmall: { price: item.price ? Math.round(item.price * 0.97) : null, productUrl: `https://list.tmall.com/search_product.htm?q=${encodeURIComponent(item.brand + ' ' + item.model)}`, shopName: "参考价" },
+          },
+        }
       }
+      setSelected((prev) => ({ ...prev, [category]: hw }))
     }
     setPendingCompare(null)
     setCompareList([])
