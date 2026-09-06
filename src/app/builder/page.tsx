@@ -30,9 +30,11 @@ import { CompatibilityReport } from "@/components/CompatibilityReport"
 import PerformanceScore from "@/components/PerformanceScore"
 import GameBenchmark from "@/components/GameBenchmark"
 import HardwareCompare, { type CompareHardware } from "@/components/HardwareCompare"
+import ImportConfig from "@/components/ImportConfig"
 import { evaluatePerformance, predictGameFPS } from "@/lib/performance"
+import { exportConfig } from "@/lib/configParser"
 import type { Components } from "@/lib/compatibility"
-import { GitCompare } from "lucide-react"
+import { GitCompare, Upload, FileText, FileJson, FileSpreadsheet, FileCode } from "lucide-react"
 
 // 8个硬件分类配置
 const CATEGORIES = [
@@ -219,6 +221,9 @@ function BuilderPageContent() {
   const [copied, setCopied] = useState(false)
   const [compareList, setCompareList] = useState<CompareHardware[]>([])
   const [pendingCompare, setPendingCompare] = useState<CompareHardware[] | null>(null)
+  const [showImport, setShowImport] = useState(false)
+  const [exportFormat, setExportFormat] = useState<"txt" | "json" | "csv" | "md">("txt")
+  const [allHardwareList, setAllHardwareList] = useState<Hardware[]>([])
 
   // 获取某分类的硬件列表
   useEffect(() => {
@@ -245,6 +250,19 @@ function BuilderPageContent() {
       })
     return () => controller.abort()
   }, [activeCategory])
+
+  // 加载所有硬件（用于导入配置时的匹配）
+  useEffect(() => {
+    const categories = ["CPU", "GPU", "MOBO", "RAM", "SSD", "PSU", "CASE", "COOLER"]
+    Promise.all(
+      categories.map((cat) =>
+        fetch(`/api/hardware?category=${cat}&pageSize=100`).then((res) => res.json())
+      )
+    ).then((results) => {
+      const all = results.flatMap((r) => (r.success ? r.data.list : []))
+      setAllHardwareList(all)
+    })
+  }, [])
 
   // 计算总价
   const totalPrice = useMemo(() => {
@@ -379,6 +397,37 @@ function BuilderPageContent() {
     URL.revokeObjectURL(url)
   }
 
+  // 多格式导出
+  const handleExportFormat = (format: "txt" | "json" | "csv" | "md") => {
+    const result = exportConfig(selected, totalPrice, format)
+    const blob = new Blob([result.content], { type: `${result.mimeType};charset=utf-8` })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement("a")
+    a.href = url
+    a.download = result.filename
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
+  // 导入配置
+  const handleImport = (items: { category: string; hardwareId: number }[]) => {
+    // 需要先加载这些硬件的完整信息
+    items.forEach(({ category, hardwareId }) => {
+      fetch(`/api/hardware?category=${category}&pageSize=100`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data.success) {
+            const hw = data.data.list.find((h: Hardware) => h.id === hardwareId)
+            if (hw) {
+              setSelected((prev) => ({ ...prev, [category]: hw }))
+            }
+          }
+        })
+    })
+  }
+
   const compatibilityComponents = useMemo(
     () =>
       ({
@@ -486,16 +535,27 @@ function BuilderPageContent() {
                 {formatPrice(totalPrice)}
               </div>
             </div>
-            <Button
-              size="sm"
-              variant="outline"
-              disabled={selectedCount === 0}
-              onClick={() => setShowExport(true)}
-              className="rounded-full border-black/15 text-black/70 hover:bg-black hover:text-white hover:border-black"
-            >
-              <Share2 className="mr-2 h-4 w-4" />
-              导出
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => setShowImport(true)}
+                className="rounded-full border-[#00b4a8]/40 text-[#00b4a8] hover:bg-[#00b4a8] hover:text-white hover:border-[#00b4a8]"
+              >
+                <Upload className="mr-2 h-4 w-4" />
+                导入
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={selectedCount === 0}
+                onClick={() => setShowExport(true)}
+                className="rounded-full border-black/15 text-black/70 hover:bg-black hover:text-white hover:border-black"
+              >
+                <Share2 className="mr-2 h-4 w-4" />
+                导出
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -752,11 +812,37 @@ function BuilderPageContent() {
             <DialogTitle className="text-xl font-semibold">导出配置清单</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
-            <div className="max-h-64 overflow-y-auto rounded-xl border border-black/5 bg-[#f5f5f7] p-4">
+            {/* 格式选择 */}
+            <div className="grid grid-cols-4 gap-2">
+              {[
+                { key: "txt", label: "TXT", icon: FileText },
+                { key: "json", label: "JSON", icon: FileJson },
+                { key: "csv", label: "CSV", icon: FileSpreadsheet },
+                { key: "md", label: "Markdown", icon: FileCode },
+              ].map(({ key, label, icon: Icon }) => (
+                <button
+                  key={key}
+                  onClick={() => setExportFormat(key as any)}
+                  className={`flex flex-col items-center gap-1 py-3 rounded-xl border transition-all ${
+                    exportFormat === key
+                      ? "border-[#00b4a8] bg-[#00b4a8]/10 text-[#00b4a8]"
+                      : "border-black/10 text-black/60 hover:border-black/20"
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span className="text-xs font-medium">{label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* 预览 */}
+            <div className="max-h-48 overflow-y-auto rounded-xl border border-black/5 bg-[#f5f5f7] p-4">
               <pre className="whitespace-pre-wrap font-mono text-xs text-black/70">
-                {generateConfigText()}
+                {exportConfig(selected, totalPrice, exportFormat).content.slice(0, 500)}
+                {exportConfig(selected, totalPrice, exportFormat).content.length > 500 && "\n..."}
               </pre>
             </div>
+
             <div className="flex gap-3">
               <Button
                 onClick={handleCopy}
@@ -765,19 +851,27 @@ function BuilderPageContent() {
                 {copied ? "已复制 ✓" : "复制到剪贴板"}
               </Button>
               <Button
-                onClick={handleDownload}
-                variant="outline"
-                className="flex-1 rounded-full border-black/10 hover:bg-black hover:text-white"
+                onClick={() => handleExportFormat(exportFormat)}
+                className="flex-1 rounded-full bg-[#00b4a8] text-white hover:bg-[#00a094]"
               >
-                下载 TXT
+                下载 {exportFormat.toUpperCase()}
               </Button>
             </div>
             <p className="text-center text-xs text-black/60">
-              配置清单包含硬件型号、参数、价格及购买链接
+              支持 TXT / JSON / CSV / Markdown 四种格式
             </p>
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* 导入配置弹窗 */}
+      {showImport && (
+        <ImportConfig
+          hardwareList={allHardwareList}
+          onImport={handleImport}
+          onClose={() => setShowImport(false)}
+        />
+      )}
     </div>
   )
 }
