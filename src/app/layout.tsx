@@ -1,6 +1,7 @@
 ﻿import type { Metadata } from "next";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "PC Builder Pro - 智能装机选型助手",
@@ -10,9 +11,10 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="zh-CN" className="h-full antialiased">
-      <body className="flex min-h-full flex-col bg-slate-950 text-slate-100">
+      <body className="flex min-h-full flex-col bg-white text-black">
         <Navbar />
         <main className="flex-1">{children}</main>
+        <Footer />
       </body>
     </html>
   );
