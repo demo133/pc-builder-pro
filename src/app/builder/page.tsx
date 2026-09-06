@@ -218,7 +218,7 @@ function BuilderPageContent() {
   const [showExport, setShowExport] = useState(false)
   const [copied, setCopied] = useState(false)
   const [compareList, setCompareList] = useState<CompareHardware[]>([])
-  const [showCompare, setShowCompare] = useState(false)
+  const [pendingCompare, setPendingCompare] = useState<CompareHardware[] | null>(null)
 
   // 获取某分类的硬件列表
   useEffect(() => {
@@ -424,15 +424,15 @@ function BuilderPageContent() {
   }
 
   const handleCompareSelect = (item: CompareHardware) => {
-    if (activeCategory) {
+    const category = pendingCompare?.[0]?.category as keyof typeof selected | undefined
+    if (category) {
       const hw = hardwareList.find((h) => h.id === item.id)
       if (hw) {
-        setSelected((prev) => ({ ...prev, [activeCategory]: hw }))
+        setSelected((prev) => ({ ...prev, [category]: hw }))
       }
     }
-    setShowCompare(false)
+    setPendingCompare(null)
     setCompareList([])
-    setActiveCategory(null)
     setSearchTerm("")
     setBrandFilter("all")
   }
@@ -667,7 +667,10 @@ function BuilderPageContent() {
                 {compareList.length === 2 && (
                   <Button
                     size="sm"
-                    onClick={() => setShowCompare(true)}
+                    onClick={() => {
+                      setPendingCompare([...compareList])
+                      setActiveCategory(null)
+                    }}
                     className="rounded-full bg-black text-white hover:bg-black/80"
                   >
                     开始对比
@@ -711,11 +714,11 @@ function BuilderPageContent() {
       </Dialog>
 
       {/* 硬件对比弹窗 */}
-      {showCompare && compareList.length === 2 && (
+      {pendingCompare && pendingCompare.length === 2 && (
         <HardwareCompare
-          itemA={compareList[0]}
-          itemB={compareList[1]}
-          onClose={() => setShowCompare(false)}
+          itemA={pendingCompare[0]}
+          itemB={pendingCompare[1]}
+          onClose={() => setPendingCompare(null)}
           onSelect={handleCompareSelect}
         />
       )}
