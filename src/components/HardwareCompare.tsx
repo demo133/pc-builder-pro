@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { parseSpecs, getCompareParams } from "@/lib/performance"
 import { X } from "lucide-react"
@@ -67,7 +67,7 @@ export default function HardwareCompare({ itemA, itemB, onClose, onSelect }: Pro
             onClick={onClose}
             className="p-1.5 rounded-full hover:bg-black/5 transition-colors"
           >
-            <X className="w-5 h-5 text-black/50" />
+            <X className="w-5 h-5 text-black/70" />
           </button>
         </div>
 
@@ -76,7 +76,7 @@ export default function HardwareCompare({ itemA, itemB, onClose, onSelect }: Pro
           <table className="w-full">
             <thead className="sticky top-0 bg-white">
               <tr className="border-b border-black/10">
-                <th className="text-left p-4 text-sm font-medium text-black/40 w-28">参数</th>
+                <th className="text-left p-4 text-sm font-medium text-black/60 w-28">参数</th>
                 <th className="text-left p-4">
                   <div className="space-y-1">
                     <p className="font-semibold text-black/90 text-sm">{itemA.brand} {itemA.model}</p>
@@ -99,7 +99,7 @@ export default function HardwareCompare({ itemA, itemB, onClose, onSelect }: Pro
 
                 return (
                   <tr key={label} className="border-b border-black/5 hover:bg-black/[0.02]">
-                    <td className="p-4 text-sm text-black/50">{label}</td>
+                    <td className="p-4 text-sm text-black/70">{label}</td>
                     <td
                       className={`p-4 text-sm ${
                         winner === "A"

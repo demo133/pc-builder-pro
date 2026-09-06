@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
@@ -108,7 +108,7 @@ export default function PricesPage() {
             <TrendingUp className="h-6 w-6 text-black" />
             <h1 className="text-3xl font-bold tracking-tight text-black">价格监控</h1>
           </div>
-          <p className="mt-2 text-black/50">
+          <p className="mt-2 text-black/70">
             实时追踪各平台硬件价格，当前展示京东参考价（爬虫接入后自动更新）
           </p>
         </div>
@@ -159,7 +159,7 @@ export default function PricesPage() {
             })}
           </div>
           <div className="relative w-full sm:w-64">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-black/50" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-black/70" />
             <Input
               placeholder="搜索型号或品牌..."
               value={searchTerm}
@@ -272,7 +272,7 @@ export default function PricesPage() {
             <div className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-black/40" />
             <div>
               <div className="text-sm font-medium text-black">价格数据说明</div>
-              <p className="mt-1 text-xs text-black/50">
+              <p className="mt-1 text-xs text-black/70">
                 京东价为爬虫抓取的参考价，天猫价为估算参考价。点击价格标签可跳转到对应商城搜索结果页。运行 <code className="rounded bg-white px-1.5 py-0.5 text-black/70">python crawler/jd_crawler.py</code> 可更新京东实时价格。
               </p>
             </div>

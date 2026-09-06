@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useMemo } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -31,13 +31,13 @@ export function CompatibilityReport({ components }: CompatibilityReportProps) {
   const selectedCount = Object.values(components).filter(Boolean).length
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-black"
+    if (score >= 80) return "text-[#00b4a8]"
     if (score >= 60) return "text-amber-600"
     return "text-red-600"
   }
 
   const getScoreBg = (score: number) => {
-    if (score >= 80) return "bg-black"
+    if (score >= 80) return "bg-[#00b4a8]"
     if (score >= 60) return "bg-amber-500"
     return "bg-red-500"
   }
@@ -81,7 +81,7 @@ export function CompatibilityReport({ components }: CompatibilityReportProps) {
             </div>
             <p className="mt-1 text-sm text-black/80">{issue.message}</p>
             {issue.suggestion && (
-              <p className="mt-1 text-xs text-black/50">
+              <p className="mt-1 text-xs text-black/70">
                 建议：{issue.suggestion}
               </p>
             )}
@@ -126,7 +126,7 @@ export function CompatibilityReport({ components }: CompatibilityReportProps) {
 
         {/* 问题列表 */}
         {selectedCount === 0 ? (
-          <div className="py-4 text-center text-sm text-black/50">
+          <div className="py-4 text-center text-sm text-black/70">
             选择硬件后自动检测兼容性
           </div>
         ) : (

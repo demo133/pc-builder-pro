@@ -1,4 +1,4 @@
-import Link from "next/link"
+﻿import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ScrollReveal } from "@/components/ScrollReveal"
@@ -80,7 +80,7 @@ export default function Home() {
             <br />
             <span className="gradient-text">选型助手</span>
           </h1>
-          <p className="animate-fade-in-up delay-200 mx-auto mb-10 max-w-xl text-lg text-black/50">
+          <p className="animate-fade-in-up delay-200 mx-auto mb-10 max-w-xl text-lg text-black/70">
             智能兼容性检查、实时价格监控、预算配置推荐
             <br />
             让每一分钱都花在刀刃上
@@ -108,7 +108,7 @@ export default function Home() {
 
           {/* 向下滚动提示 */}
           <div className="animate-fade-in-up delay-500 mt-20 flex justify-center">
-            <ChevronDown className="h-6 w-6 animate-bounce text-black/50" />
+            <ChevronDown className="h-6 w-6 animate-bounce text-black/70" />
           </div>
         </div>
       </section>
@@ -117,7 +117,7 @@ export default function Home() {
       <section className="border-y border-black/5 bg-[#f5f5f7]">
         <div className="mx-auto grid max-w-4xl grid-cols-3 divide-x divide-black/5">
           {[
-            { num: 88, suffix: "+", label: "硬件型号" },
+            { num: 241, suffix: "+", label: "硬件型号" },
             { num: 15, suffix: "", label: "兼容性检查" },
             { num: 3, suffix: "", label: "预置方案" },
           ].map((item, i) => (
@@ -125,7 +125,7 @@ export default function Home() {
               <div className="headline-lg text-black">
                 <Counter end={item.num} suffix={item.suffix} />
               </div>
-              <div className="mt-2 text-sm text-black/50">{item.label}</div>
+              <div className="mt-2 text-sm text-black/70">{item.label}</div>
             </div>
           ))}
         </div>
@@ -137,7 +137,7 @@ export default function Home() {
           <ScrollReveal>
             <div className="mb-16 text-center">
               <h2 className="headline-lg mb-4 text-black">四大核心能力</h2>
-              <p className="text-black/50">覆盖装机全流程</p>
+              <p className="text-black/70">覆盖装机全流程</p>
             </div>
           </ScrollReveal>
           <div className="grid gap-6 sm:grid-cols-2">
@@ -154,7 +154,7 @@ export default function Home() {
                         <h3 className="mb-2 text-xl font-semibold text-black">
                           {feature.title}
                         </h3>
-                        <p className="text-black/50">{feature.desc}</p>
+                        <p className="text-black/70">{feature.desc}</p>
                       </CardContent>
                     </Card>
                   </Link>
@@ -171,7 +171,7 @@ export default function Home() {
           <ScrollReveal>
             <div className="mb-16 text-center">
               <h2 className="headline-lg mb-4 text-black">四步完成装机</h2>
-              <p className="text-black/50">简单流程，小白也能轻松上手</p>
+              <p className="text-black/70">简单流程，小白也能轻松上手</p>
             </div>
           </ScrollReveal>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
@@ -191,7 +191,7 @@ export default function Home() {
                     <h3 className="mb-1 text-lg font-semibold text-black">
                       {step.title}
                     </h3>
-                    <p className="text-sm text-black/50">{step.desc}</p>
+                    <p className="text-sm text-black/70">{step.desc}</p>
                   </div>
                 </ScrollReveal>
               )
@@ -206,7 +206,7 @@ export default function Home() {
           <ScrollReveal>
             <div className="mb-16 text-center">
               <h2 className="headline-lg mb-4 text-black">热门配置方案</h2>
-              <p className="text-black/50">经过验证的高性价比配置</p>
+              <p className="text-black/70">经过验证的高性价比配置</p>
             </div>
           </ScrollReveal>
           <div className="grid gap-6 md:grid-cols-3">
@@ -220,7 +220,7 @@ export default function Home() {
                     <h3 className="mb-1 text-xl font-semibold text-black">
                       {config.name}
                     </h3>
-                    <p className="mb-4 text-sm text-black/50">{config.desc}</p>
+                    <p className="mb-4 text-sm text-black/70">{config.desc}</p>
                     <div className="mb-6 text-2xl font-bold text-black">
                       {config.price}
                     </div>

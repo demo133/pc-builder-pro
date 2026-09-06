@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState, useMemo, useEffect, useCallback, Suspense, memo } from "react"
 import { useSearchParams } from "next/navigation"
@@ -129,7 +129,7 @@ const HardwareListItem = memo(function HardwareListItem({
           <div className="font-medium text-black">
             {hw.brand} {hw.model}
           </div>
-          <div className="mt-0.5 text-xs text-black/50">
+          <div className="mt-0.5 text-xs text-black/70">
             {getKeySpecs(hw)}
           </div>
         </div>
@@ -195,7 +195,7 @@ const HardwareListItem = memo(function HardwareListItem({
               className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors ${
                 isComparing
                   ? "bg-black text-white"
-                  : "bg-black/5 text-black/50 hover:bg-black/10"
+                  : "bg-black/5 text-black/70 hover:bg-black/10"
               }`}
               title="加入对比"
             >
@@ -509,7 +509,7 @@ function BuilderPageContent() {
                           </div>
                         </div>
                       ) : (
-                        <div className="mt-0.5 text-sm text-black/50">
+                        <div className="mt-0.5 text-sm text-black/70">
                           未选择
                         </div>
                       )}
@@ -627,7 +627,7 @@ function BuilderPageContent() {
 
           <div className="flex gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-black/50" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-black/70" />
               <Input
                 placeholder="搜索型号..."
                 value={searchTerm}
@@ -660,7 +660,7 @@ function BuilderPageContent() {
               <div className="flex gap-2">
                 <button
                   onClick={() => setCompareList([])}
-                  className="text-xs text-black/50 hover:text-black/80"
+                  className="text-xs text-black/70 hover:text-black/80"
                 >
                   清空
                 </button>

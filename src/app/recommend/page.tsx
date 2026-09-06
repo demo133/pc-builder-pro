@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -158,7 +158,7 @@ export default function RecommendPage() {
             <Sparkles className="h-6 w-6 text-black" />
             <h1 className="text-3xl font-bold tracking-tight text-black">预算配置推荐</h1>
           </div>
-          <p className="mt-2 text-black/50">
+          <p className="mt-2 text-black/70">
             输入预算和用途，智能推荐最优配置方案
           </p>
         </div>
@@ -286,7 +286,7 @@ export default function RecommendPage() {
 
         {!loading && hasSearched && results.length === 0 && (
           <div className="mt-8 rounded-2xl border border-black/5 bg-[#f5f5f7] p-12 text-center">
-            <p className="text-black/50">没有找到匹配的配置方案，试试调整预算或用途</p>
+            <p className="text-black/70">没有找到匹配的配置方案，试试调整预算或用途</p>
           </div>
         )}
 
@@ -319,7 +319,7 @@ export default function RecommendPage() {
                         </span>
                         <span
                           className={`text-xs ${
-                            config.budgetDiff > 0 ? "text-amber-600" : "text-black/50"
+                            config.budgetDiff > 0 ? "text-amber-600" : "text-black/70"
                           }`}
                         >
                           {config.budgetDiff > 0

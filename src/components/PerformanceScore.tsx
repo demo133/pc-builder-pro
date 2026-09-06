@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { PerformanceScore as PerformanceScoreType } from "@/lib/performance"
 
@@ -26,7 +26,7 @@ function ScoreBar({ label, value, icon }: { label: string; value: number; icon: 
       </div>
       <div className="h-1.5 bg-black/10 rounded-full overflow-hidden">
         <div
-          className="h-full bg-black rounded-full transition-all duration-700 ease-out"
+          className="h-full bg-[#00b4a8] rounded-full transition-all duration-700 ease-out"
           style={{ width: `${value}%` }}
         />
       </div>
@@ -56,7 +56,7 @@ export default function PerformanceScore({ score }: Props) {
               cy="50"
               r="42"
               fill="none"
-              stroke="#1d1d1f"
+              stroke="#00b4a8"
               strokeWidth="8"
               strokeLinecap="round"
               strokeDasharray={`${(overall / 100) * 264} 264`}
@@ -65,7 +65,7 @@ export default function PerformanceScore({ score }: Props) {
           </svg>
           <div className="absolute inset-0 flex flex-col items-center justify-center">
             <span className="text-3xl font-bold text-black/90">{overall}</span>
-            <span className="text-xs text-black/40">/ 100</span>
+            <span className="text-xs text-black/60">/ 100</span>
           </div>
         </div>
         <div className="flex-1 space-y-3">
@@ -84,7 +84,7 @@ export default function PerformanceScore({ score }: Props) {
         </div>
       )}
 
-      <p className="text-xs text-black/40">
+      <p className="text-xs text-black/60">
         * 基于硬件规格的估算评分，仅供参考，实际性能因驱动、优化、散热等因素而异
       </p>
     </div>

@@ -13,7 +13,9 @@
   --secondary-foreground: #1d1d1f;
   --muted: #f5f5f7;
   --muted-foreground: #86868b;
-  --accent: #0071e3;
+  --accent: #00b4a8;
+  --accent-light: #33d4cc;
+  --accent-dark: #008a82;
   --destructive: #ff3b30;
   --success: #34c759;
   --warning: #ff9500;
@@ -34,6 +36,8 @@
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
+  --color-accent-dark: var(--accent-dark);
   --color-destructive: var(--destructive);
   --color-success: var(--success);
   --color-warning: var(--warning);
@@ -75,7 +79,7 @@ body {
 
 /* 选中态 */
 ::selection {
-  background: rgba(0, 113, 227, 0.15);
+  background: rgba(0, 180, 168, 0.18);
   color: #1d1d1f;
 }
 
@@ -180,7 +184,7 @@ button:disabled:active {
   50% { background-position: 100% 50%; }
 }
 .gradient-text {
-  background: linear-gradient(135deg, #1d1d1f, #86868b, #1d1d1f);
+  background: linear-gradient(135deg, #00b4a8, #0ea5e9, #00b4a8);
   background-size: 200% 200%;
   -webkit-background-clip: text;
   background-clip: text;
