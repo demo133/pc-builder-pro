@@ -1,3 +1,9 @@
 {
-  "installCommand": "npm install"
+  "installCommand": "npm install",
+  "crons": [
+    {
+      "path": "/api/cron/price-update",
+      "schedule": "0 3 * * *"
+    }
+  ]
 }
