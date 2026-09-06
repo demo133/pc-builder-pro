@@ -469,7 +469,7 @@ function BuilderPageContent() {
               variant="outline"
               disabled={selectedCount === 0}
               onClick={() => setShowExport(true)}
-              className="rounded-full border-black/10 hover:bg-black hover:text-white"
+              className="rounded-full border-black/15 text-black/70 hover:bg-black hover:text-white hover:border-black"
             >
               <Share2 className="mr-2 h-4 w-4" />
               导出
@@ -534,11 +534,11 @@ function BuilderPageContent() {
                       )}
                       <Button
                         size="sm"
-                        variant={selectedItem ? "outline" : "default"}
+                        variant="outline"
                         onClick={() => setActiveCategory(cat.key)}
                         className={selectedItem
-                          ? "rounded-full border-black/10 hover:bg-black hover:text-white"
-                          : "rounded-full bg-black text-white hover:bg-black/80"
+                          ? "rounded-full border-black/15 text-black/70 hover:bg-black hover:text-white hover:border-black"
+                          : "rounded-full border-[#00b4a8]/40 text-[#00b4a8] hover:bg-[#00b4a8] hover:text-white hover:border-[#00b4a8]"
                         }
                       >
                         {selectedItem ? "更换" : "选择"}
