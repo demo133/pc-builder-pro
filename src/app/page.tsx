@@ -108,7 +108,7 @@ export default function Home() {
 
           {/* 向下滚动提示 */}
           <div className="animate-fade-in-up delay-500 mt-20 flex justify-center">
-            <ChevronDown className="h-6 w-6 animate-bounce text-black/30" />
+            <ChevronDown className="h-6 w-6 animate-bounce text-black/50" />
           </div>
         </div>
       </section>
@@ -184,7 +184,7 @@ export default function Home() {
                       <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black text-white">
                         <Icon className="h-5 w-5" />
                       </div>
-                      <span className="text-sm font-medium text-black/40">
+                      <span className="text-sm font-medium text-black/60">
                         0{index + 1}
                       </span>
                     </div>
@@ -264,7 +264,7 @@ export default function Home() {
       </section>
 
       {/* 底部 */}
-      <footer className="border-t border-black/5 bg-[#f5f5f7] py-10 text-center text-sm text-black/40">
+      <footer className="border-t border-black/5 bg-[#f5f5f7] py-10 text-center text-sm text-black/60">
         <p>PC Builder — 让 DIY 装机更简单</p>
         <p className="mt-1 text-xs">价格数据仅供参考，下单前请以实际平台为准</p>
       </footer>

@@ -119,19 +119,19 @@ export default function PricesPage() {
         <div className="mb-8 grid grid-cols-3 gap-4">
           <Card className="border-0 bg-[#f5f5f7] shadow-none">
             <CardContent className="p-5">
-              <div className="text-xs text-black/40">监控硬件</div>
+              <div className="text-xs text-black/60">监控硬件</div>
               <div className="mt-1 text-2xl font-bold text-black">{totalCount}</div>
             </CardContent>
           </Card>
           <Card className="border-0 bg-[#f5f5f7] shadow-none">
             <CardContent className="p-5">
-              <div className="text-xs text-black/40">有价格</div>
+              <div className="text-xs text-black/60">有价格</div>
               <div className="mt-1 text-2xl font-bold text-black">{withPriceCount}</div>
             </CardContent>
           </Card>
           <Card className="border-0 bg-[#f5f5f7] shadow-none">
             <CardContent className="p-5">
-              <div className="text-xs text-black/40">平均价格</div>
+              <div className="text-xs text-black/60">平均价格</div>
               <div className="mt-1 text-2xl font-bold text-black">{formatPrice(avgPrice)}</div>
             </CardContent>
           </Card>
@@ -149,7 +149,7 @@ export default function PricesPage() {
                   className={`flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
                     activeCategory === cat.key
                       ? "bg-black text-white"
-                      : "text-black/60 hover:bg-black/5"
+                      : "bg-white text-black/70 hover:bg-black/10 hover:text-black"
                   }`}
                 >
                   <Icon className="h-4 w-4" />
@@ -159,7 +159,7 @@ export default function PricesPage() {
             })}
           </div>
           <div className="relative w-full sm:w-64">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-black/30" />
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-black/50" />
             <Input
               placeholder="搜索型号或品牌..."
               value={searchTerm}
@@ -177,7 +177,7 @@ export default function PricesPage() {
             ))}
           </div>
         ) : filteredList.length === 0 ? (
-          <div className="rounded-2xl border border-black/5 bg-[#f5f5f7] p-12 text-center text-black/40">
+          <div className="rounded-2xl border border-black/5 bg-[#f5f5f7] p-12 text-center text-black/60">
             没有找到匹配的硬件
           </div>
         ) : (
@@ -198,11 +198,11 @@ export default function PricesPage() {
                         <span className="font-medium text-black">
                           {hw.brand} {hw.model}
                         </span>
-                        <Badge variant="outline" className="rounded-full text-xs text-black/40 border-black/10">
+                        <Badge variant="outline" className="rounded-full text-xs text-black/60 border-black/10">
                           {hw.category}
                         </Badge>
                       </div>
-                      <div className="mt-0.5 flex items-center gap-3 text-xs text-black/40">
+                      <div className="mt-0.5 flex items-center gap-3 text-xs text-black/60">
                         <span className="flex items-center gap-1">
                           <Clock className="h-3 w-3" />
                           {hw.prices?.jd?.crawledAt ? formatDate(hw.prices.jd.crawledAt) : "未更新"}
@@ -230,8 +230,8 @@ export default function PricesPage() {
                           rel="noopener noreferrer"
                           className="flex items-center gap-2 rounded-full bg-white px-3 py-1 transition-colors hover:bg-black/5"
                         >
-                          <span className="text-xs text-black/40">京东</span>
-                          <span className="text-xs text-black/40">去搜索 →</span>
+                          <span className="text-xs text-black/60">京东</span>
+                          <span className="text-xs text-black/60">去搜索 →</span>
                         </a>
                       )}
                       {/* 天猫价 */}
@@ -254,8 +254,8 @@ export default function PricesPage() {
                           rel="noopener noreferrer"
                           className="flex items-center gap-2 rounded-full bg-white px-3 py-1 transition-colors hover:bg-black/5"
                         >
-                          <span className="text-xs text-black/40">天猫</span>
-                          <span className="text-xs text-black/40">去搜索 →</span>
+                          <span className="text-xs text-black/60">天猫</span>
+                          <span className="text-xs text-black/60">去搜索 →</span>
                         </a>
                       )}
                     </div>

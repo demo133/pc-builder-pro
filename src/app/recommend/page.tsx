@@ -176,7 +176,7 @@ export default function RecommendPage() {
                   预算金额
                 </label>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-black/40">¥</span>
+                  <span className="text-sm text-black/60">¥</span>
                   <Input
                     type="text"
                     inputMode="numeric"
@@ -195,7 +195,7 @@ export default function RecommendPage() {
                 max={20000}
                 step={100}
               />
-              <div className="mt-1 flex justify-between text-xs text-black/40">
+              <div className="mt-1 flex justify-between text-xs text-black/60">
                 <span>¥2,000</span>
                 <span>¥20,000</span>
               </div>
@@ -208,7 +208,7 @@ export default function RecommendPage() {
                     className={`rounded-full px-4 py-1.5 text-xs font-medium transition-all ${
                       budget === v
                         ? "bg-black text-white"
-                        : "bg-white text-black/60 hover:bg-black/5"
+                        : "bg-white text-black/70 hover:bg-black/10"
                     }`}
                   >
                     ¥{v.toLocaleString()}
@@ -231,7 +231,7 @@ export default function RecommendPage() {
                     onClick={() => setUseCase(uc.value)}
                     className={useCase === uc.value
                       ? "rounded-full bg-black text-white hover:bg-black/80"
-                      : "rounded-full border-black/10 hover:bg-black/5"
+                      : "rounded-full border-black/20 bg-white text-black/70 hover:bg-black/10 hover:text-black"
                     }
                   >
                     {uc.label}
@@ -254,7 +254,7 @@ export default function RecommendPage() {
                     onClick={() => setPriority(p.value)}
                     className={priority === p.value
                       ? "rounded-full bg-black text-white hover:bg-black/80"
-                      : "rounded-full border-black/10 hover:bg-black/5"
+                      : "rounded-full border-black/20 bg-white text-black/70 hover:bg-black/10 hover:text-black"
                     }
                   >
                     {p.label}
@@ -338,8 +338,8 @@ export default function RecommendPage() {
                             className="flex items-center justify-between border-b border-black/5 pb-2 text-sm last:border-0"
                           >
                             <div className="flex min-w-0 items-center gap-2">
-                              <Icon className="h-4 w-4 shrink-0 text-black/40" />
-                              <span className="text-xs text-black/40">
+                              <Icon className="h-4 w-4 shrink-0 text-black/60" />
+                              <span className="text-xs text-black/60">
                                 {CATEGORY_LABELS[key.toUpperCase()] || key}
                               </span>
                               <span className="truncate text-black">

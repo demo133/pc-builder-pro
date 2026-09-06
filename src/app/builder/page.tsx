@@ -143,8 +143,8 @@ const HardwareListItem = memo(function HardwareListItem({
               onClick={(e) => e.stopPropagation()}
               className="flex items-center gap-1.5 rounded-full bg-black/5 px-2.5 py-0.5 text-xs hover:bg-black/10"
             >
-              <span className="text-black/40">京东</span>
-              <span className="text-black/40">去搜索</span>
+              <span className="text-black/60">京东</span>
+              <span className="text-black/60">去搜索</span>
             </a>
           )}
           {hw.prices?.tmall?.price ? (
@@ -168,8 +168,8 @@ const HardwareListItem = memo(function HardwareListItem({
               onClick={(e) => e.stopPropagation()}
               className="flex items-center gap-1.5 rounded-full bg-black/5 px-2.5 py-0.5 text-xs hover:bg-black/10"
             >
-              <span className="text-black/40">天猫</span>
-              <span className="text-black/40">去搜索</span>
+              <span className="text-black/60">天猫</span>
+              <span className="text-black/60">去搜索</span>
             </a>
           )}
         </div>
@@ -378,7 +378,7 @@ function BuilderPageContent() {
           </div>
           <div className="flex items-center gap-4">
             <div className="text-right">
-              <div className="text-xs text-black/40">配置总价</div>
+              <div className="text-xs text-black/60">配置总价</div>
               <div className="text-xl font-bold text-black">
                 {formatPrice(totalPrice)}
               </div>
@@ -414,7 +414,7 @@ function BuilderPageContent() {
                       <Icon className="h-5 w-5" />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="text-xs font-medium text-black/40">
+                      <div className="text-xs font-medium text-black/60">
                         {cat.label}
                       </div>
                       {selectedItem ? (
@@ -422,12 +422,12 @@ function BuilderPageContent() {
                           <div className="truncate font-semibold text-black">
                             {selectedItem.brand} {selectedItem.model}
                           </div>
-                          <div className="text-xs text-black/50">
+                          <div className="text-xs text-black/60">
                             {getKeySpecs(selectedItem)}
                           </div>
                         </div>
                       ) : (
-                        <div className="mt-0.5 text-sm text-black/30">
+                        <div className="mt-0.5 text-sm text-black/50">
                           未选择
                         </div>
                       )}
@@ -445,7 +445,7 @@ function BuilderPageContent() {
                           size="sm"
                           variant="ghost"
                           onClick={() => handleRemove(cat.key)}
-                          className="text-black/40 hover:text-black"
+                          className="text-black/60 hover:text-black"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
@@ -477,7 +477,7 @@ function BuilderPageContent() {
                 </CardHeader>
                 <CardContent className="space-y-3">
                   {selectedCount === 0 ? (
-                    <div className="py-8 text-center text-sm text-black/40">
+                    <div className="py-8 text-center text-sm text-black/60">
                       还未选择任何硬件
                       <br />
                       点击左侧"选择"按钮开始配置
@@ -493,7 +493,7 @@ function BuilderPageContent() {
                             className="flex items-center justify-between border-b border-black/5 pb-2 text-sm last:border-0"
                           >
                             <div className="min-w-0">
-                              <div className="text-xs text-black/40">{cat.label}</div>
+                              <div className="text-xs text-black/60">{cat.label}</div>
                               <div className="truncate text-black">{item.brand} {item.model}</div>
                             </div>
                             <div className="ml-2 shrink-0 font-mono text-black">
@@ -533,7 +533,7 @@ function BuilderPageContent() {
 
           <div className="flex gap-3">
             <div className="relative flex-1">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-black/30" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-black/50" />
               <Input
                 placeholder="搜索型号..."
                 value={searchTerm}
@@ -561,7 +561,7 @@ function BuilderPageContent() {
                 ))}
               </>
             ) : filteredList.length === 0 ? (
-              <div className="py-8 text-center text-sm text-black/40">
+              <div className="py-8 text-center text-sm text-black/60">
                 没有找到匹配的硬件
               </div>
             ) : (
@@ -570,7 +570,7 @@ function BuilderPageContent() {
                   <HardwareListItem key={hw.id} hw={hw} onSelect={handleSelect} />
                 ))}
                 {filteredList.length === 30 && hardwareList.length > 30 && (
-                  <div className="py-2 text-center text-xs text-black/40">
+                  <div className="py-2 text-center text-xs text-black/60">
                     仅显示前30条，使用搜索或品牌筛选缩小范围
                   </div>
                 )}
@@ -607,7 +607,7 @@ function BuilderPageContent() {
                 下载 TXT
               </Button>
             </div>
-            <p className="text-center text-xs text-black/40">
+            <p className="text-center text-xs text-black/60">
               配置清单包含硬件型号、参数、价格及购买链接
             </p>
           </div>
@@ -621,7 +621,7 @@ export default function BuilderPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center text-black/40">
+        <div className="flex min-h-screen items-center justify-center text-black/60">
           加载中...
         </div>
       }

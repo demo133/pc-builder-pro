@@ -77,7 +77,7 @@ export function CompatibilityReport({ components }: CompatibilityReportProps) {
               <Badge variant="outline" className={`text-xs ${config.text} border-current`}>
                 {config.label}
               </Badge>
-              <span className="text-xs text-black/40">{issue.category}</span>
+              <span className="text-xs text-black/60">{issue.category}</span>
             </div>
             <p className="mt-1 text-sm text-black/80">{issue.message}</p>
             {issue.suggestion && (
@@ -105,7 +105,7 @@ export function CompatibilityReport({ components }: CompatibilityReportProps) {
           <div className={`text-4xl font-bold ${getScoreColor(result.score)}`}>
             {result.score}
           </div>
-          <div className="text-xs text-black/40">综合评分 / 100</div>
+          <div className="text-xs text-black/60">综合评分 / 100</div>
           <Progress
             value={result.score}
             className={`mt-2 h-1.5 ${getScoreBg(result.score)}`}
@@ -126,7 +126,7 @@ export function CompatibilityReport({ components }: CompatibilityReportProps) {
 
         {/* 问题列表 */}
         {selectedCount === 0 ? (
-          <div className="py-4 text-center text-sm text-black/30">
+          <div className="py-4 text-center text-sm text-black/50">
             选择硬件后自动检测兼容性
           </div>
         ) : (
