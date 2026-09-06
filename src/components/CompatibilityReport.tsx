@@ -30,15 +30,14 @@ export function CompatibilityReport({ components }: CompatibilityReportProps) {
 
   const selectedCount = Object.values(components).filter(Boolean).length
 
-  // 评分颜色
   const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-emerald-400"
-    if (score >= 60) return "text-amber-400"
-    return "text-red-400"
+    if (score >= 80) return "text-black"
+    if (score >= 60) return "text-amber-600"
+    return "text-red-600"
   }
 
   const getScoreBg = (score: number) => {
-    if (score >= 80) return "bg-emerald-500"
+    if (score >= 80) return "bg-black"
     if (score >= 60) return "bg-amber-500"
     return "bg-red-500"
   }
@@ -47,20 +46,20 @@ export function CompatibilityReport({ components }: CompatibilityReportProps) {
     const config = {
       fatal: {
         icon: XCircle,
-        bg: "bg-red-500/10 border-red-500/30",
-        text: "text-red-400",
+        bg: "bg-red-50 border-red-200",
+        text: "text-red-600",
         label: "致命",
       },
       warning: {
         icon: AlertTriangle,
-        bg: "bg-amber-500/10 border-amber-500/30",
-        text: "text-amber-400",
+        bg: "bg-amber-50 border-amber-200",
+        text: "text-amber-600",
         label: "警告",
       },
       info: {
         icon: Info,
-        bg: "bg-blue-500/10 border-blue-500/30",
-        text: "text-blue-400",
+        bg: "bg-blue-50 border-blue-200",
+        text: "text-blue-600",
         label: "提示",
       },
     }[issue.level]
@@ -69,7 +68,7 @@ export function CompatibilityReport({ components }: CompatibilityReportProps) {
     return (
       <div
         key={index}
-        className={`rounded-lg border p-3 ${config.bg}`}
+        className={`rounded-xl border p-3 ${config.bg}`}
       >
         <div className="flex items-start gap-2">
           <Icon className={`mt-0.5 h-4 w-4 shrink-0 ${config.text}`} />
@@ -78,11 +77,11 @@ export function CompatibilityReport({ components }: CompatibilityReportProps) {
               <Badge variant="outline" className={`text-xs ${config.text} border-current`}>
                 {config.label}
               </Badge>
-              <span className="text-xs text-slate-500">{issue.category}</span>
+              <span className="text-xs text-black/40">{issue.category}</span>
             </div>
-            <p className="mt-1 text-sm text-slate-200">{issue.message}</p>
+            <p className="mt-1 text-sm text-black/80">{issue.message}</p>
             {issue.suggestion && (
-              <p className="mt-1 text-xs text-slate-400">
+              <p className="mt-1 text-xs text-black/50">
                 建议：{issue.suggestion}
               </p>
             )}
@@ -93,10 +92,10 @@ export function CompatibilityReport({ components }: CompatibilityReportProps) {
   }
 
   return (
-    <Card className="border-slate-700 bg-slate-800/50">
+    <Card className="border-0 bg-[#f5f5f7] shadow-none">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center gap-2 text-white">
-          <ShieldCheck className="h-5 w-5 text-cyan-400" />
+        <CardTitle className="flex items-center gap-2 text-base font-semibold text-black">
+          <ShieldCheck className="h-5 w-5 text-black" />
           兼容性体检
         </CardTitle>
       </CardHeader>
@@ -106,28 +105,28 @@ export function CompatibilityReport({ components }: CompatibilityReportProps) {
           <div className={`text-4xl font-bold ${getScoreColor(result.score)}`}>
             {result.score}
           </div>
-          <div className="text-xs text-slate-400">综合评分 / 100</div>
+          <div className="text-xs text-black/40">综合评分 / 100</div>
           <Progress
             value={result.score}
-            className={`mt-2 h-2 ${getScoreBg(result.score)}`}
+            className={`mt-2 h-1.5 ${getScoreBg(result.score)}`}
           />
         </div>
 
         {/* 总评 */}
-        <div className="rounded-lg bg-slate-700/30 p-3 text-center text-sm text-slate-300">
+        <div className="rounded-xl bg-white p-3 text-center text-sm text-black/60">
           {result.summary}
         </div>
 
         {/* 统计 */}
         <div className="flex justify-center gap-4 text-xs">
-          <span className="text-red-400">致命 {fatalIssues.length}</span>
-          <span className="text-amber-400">警告 {warningIssues.length}</span>
-          <span className="text-blue-400">提示 {infoIssues.length}</span>
+          <span className="text-red-600">致命 {fatalIssues.length}</span>
+          <span className="text-amber-600">警告 {warningIssues.length}</span>
+          <span className="text-blue-600">提示 {infoIssues.length}</span>
         </div>
 
         {/* 问题列表 */}
         {selectedCount === 0 ? (
-          <div className="py-4 text-center text-sm text-slate-500">
+          <div className="py-4 text-center text-sm text-black/30">
             选择硬件后自动检测兼容性
           </div>
         ) : (
@@ -140,7 +139,7 @@ export function CompatibilityReport({ components }: CompatibilityReportProps) {
               renderIssue(issue, i + fatalIssues.length + warningIssues.length)
             )}
             {result.issues.length === 0 && (
-              <div className="flex items-center justify-center gap-2 py-4 text-sm text-emerald-400">
+              <div className="flex items-center justify-center gap-2 py-4 text-sm text-black">
                 <CheckCircle2 className="h-4 w-4" />
                 全部通过，无兼容性问题
               </div>
