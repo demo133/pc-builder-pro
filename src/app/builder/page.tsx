@@ -27,7 +27,12 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { CompatibilityReport } from "@/components/CompatibilityReport"
+import PerformanceScore from "@/components/PerformanceScore"
+import GameBenchmark from "@/components/GameBenchmark"
+import HardwareCompare, { type CompareHardware } from "@/components/HardwareCompare"
+import { evaluatePerformance, predictGameFPS } from "@/lib/performance"
 import type { Components } from "@/lib/compatibility"
+import { GitCompare } from "lucide-react"
 
 // 8个硬件分类配置
 const CATEGORIES = [
@@ -102,18 +107,25 @@ const getKeySpecs = (hw: Hardware): string => {
 const HardwareListItem = memo(function HardwareListItem({
   hw,
   onSelect,
+  onCompare,
+  isComparing,
 }: {
   hw: Hardware
   onSelect: (hw: Hardware) => void
+  onCompare?: (hw: Hardware) => void
+  isComparing?: boolean
 }) {
   const formatPrice = (cents: number) => `¥${(cents / 100).toFixed(2)}`
   return (
     <div
-      onClick={() => onSelect(hw)}
-      className="cursor-pointer rounded-xl border border-black/5 bg-[#f5f5f7] p-4 transition-all duration-300 hover:border-black/10 hover:bg-white hover:shadow-md"
+      className={`cursor-pointer rounded-xl border p-4 transition-all duration-300 hover:shadow-md ${
+        isComparing
+          ? "border-black bg-white shadow-sm"
+          : "border-black/5 bg-[#f5f5f7] hover:border-black/10 hover:bg-white"
+      }`}
     >
       <div className="flex items-center justify-between">
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1" onClick={() => onSelect(hw)}>
           <div className="font-medium text-black">
             {hw.brand} {hw.model}
           </div>
@@ -121,56 +133,74 @@ const HardwareListItem = memo(function HardwareListItem({
             {getKeySpecs(hw)}
           </div>
         </div>
-        <div className="ml-4 flex shrink-0 flex-col items-end gap-1">
-          {hw.prices?.jd?.price ? (
-            <a
-              href={hw.prices.jd.productUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-1.5 rounded-full bg-black/5 px-2.5 py-0.5 text-xs hover:bg-black/10"
+        <div className="ml-4 flex shrink-0 items-center gap-2">
+          <div className="flex flex-col items-end gap-1">
+            {hw.prices?.jd?.price ? (
+              <a
+                href={hw.prices.jd.productUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center gap-1.5 rounded-full bg-black/5 px-2.5 py-0.5 text-xs hover:bg-black/10"
+              >
+                <span className="text-black/60">京东</span>
+                <span className="font-mono font-semibold text-black">
+                  {formatPrice(hw.prices.jd.price)}
+                </span>
+              </a>
+            ) : (
+              <a
+                href={hw.prices?.jd?.productUrl || "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center gap-1.5 rounded-full bg-black/5 px-2.5 py-0.5 text-xs hover:bg-black/10"
+              >
+                <span className="text-black/60">京东</span>
+                <span className="text-black/60">去搜索</span>
+              </a>
+            )}
+            {hw.prices?.tmall?.price ? (
+              <a
+                href={hw.prices.tmall.productUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center gap-1.5 rounded-full bg-black/5 px-2.5 py-0.5 text-xs hover:bg-black/10"
+              >
+                <span className="text-black/60">天猫</span>
+                <span className="font-mono font-semibold text-black">
+                  {formatPrice(hw.prices.tmall.price)}
+                </span>
+              </a>
+            ) : (
+              <a
+                href={hw.prices?.tmall?.productUrl || "#"}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center gap-1.5 rounded-full bg-black/5 px-2.5 py-0.5 text-xs hover:bg-black/10"
+              >
+                <span className="text-black/60">天猫</span>
+                <span className="text-black/60">去搜索</span>
+              </a>
+            )}
+          </div>
+          {onCompare && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                onCompare(hw)
+              }}
+              className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition-colors ${
+                isComparing
+                  ? "bg-black text-white"
+                  : "bg-black/5 text-black/50 hover:bg-black/10"
+              }`}
+              title="加入对比"
             >
-              <span className="text-black/60">京东</span>
-              <span className="font-mono font-semibold text-black">
-                {formatPrice(hw.prices.jd.price)}
-              </span>
-            </a>
-          ) : (
-            <a
-              href={hw.prices?.jd?.productUrl || "#"}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-1.5 rounded-full bg-black/5 px-2.5 py-0.5 text-xs hover:bg-black/10"
-            >
-              <span className="text-black/60">京东</span>
-              <span className="text-black/60">去搜索</span>
-            </a>
-          )}
-          {hw.prices?.tmall?.price ? (
-            <a
-              href={hw.prices.tmall.productUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-1.5 rounded-full bg-black/5 px-2.5 py-0.5 text-xs hover:bg-black/10"
-            >
-              <span className="text-black/60">天猫</span>
-              <span className="font-mono font-semibold text-black">
-                {formatPrice(hw.prices.tmall.price)}
-              </span>
-            </a>
-          ) : (
-            <a
-              href={hw.prices?.tmall?.productUrl || "#"}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-              className="flex items-center gap-1.5 rounded-full bg-black/5 px-2.5 py-0.5 text-xs hover:bg-black/10"
-            >
-              <span className="text-black/60">天猫</span>
-              <span className="text-black/60">去搜索</span>
-            </a>
+              <GitCompare className="h-4 w-4" />
+            </button>
           )}
         </div>
       </div>
@@ -187,6 +217,8 @@ function BuilderPageContent() {
   const [brandFilter, setBrandFilter] = useState("all")
   const [showExport, setShowExport] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [compareList, setCompareList] = useState<CompareHardware[]>([])
+  const [showCompare, setShowCompare] = useState(false)
 
   // 获取某分类的硬件列表
   useEffect(() => {
@@ -356,6 +388,55 @@ function BuilderPageContent() {
     [selected]
   )
 
+  // 性能评分
+  const performance = useMemo(() => {
+    return evaluatePerformance({
+      cpu: selected.CPU ? { specs: JSON.stringify(selected.CPU.specs), model: selected.CPU.model } : null,
+      gpu: selected.GPU ? { specs: JSON.stringify(selected.GPU.specs), model: selected.GPU.model } : null,
+      ram: selected.RAM ? { specs: JSON.stringify(selected.RAM.specs), model: selected.RAM.model } : null,
+      ssd: selected.SSD ? { specs: JSON.stringify(selected.SSD.specs), model: selected.SSD.model } : null,
+    })
+  }, [selected])
+
+  // 游戏帧数预测
+  const gameBenchmarks = useMemo(() => {
+    return predictGameFPS(performance.cpu, performance.gpu, !!selected.GPU)
+  }, [performance, selected.GPU])
+
+  // 对比功能
+  const toggleCompare = (hw: Hardware) => {
+    setCompareList((prev) => {
+      const exists = prev.find((h) => h.id === hw.id)
+      if (exists) {
+        return prev.filter((h) => h.id !== hw.id)
+      }
+      if (prev.length >= 2) {
+        return [prev[1], {
+          id: hw.id, brand: hw.brand, model: hw.model, fullName: hw.fullName,
+          specs: JSON.stringify(hw.specs), price: hw.price?.price, category: hw.category,
+        }]
+      }
+      return [...prev, {
+        id: hw.id, brand: hw.brand, model: hw.model, fullName: hw.fullName,
+        specs: JSON.stringify(hw.specs), price: hw.price?.price, category: hw.category,
+      }]
+    })
+  }
+
+  const handleCompareSelect = (item: CompareHardware) => {
+    if (activeCategory) {
+      const hw = hardwareList.find((h) => h.id === item.id)
+      if (hw) {
+        setSelected((prev) => ({ ...prev, [activeCategory]: hw }))
+      }
+    }
+    setShowCompare(false)
+    setCompareList([])
+    setActiveCategory(null)
+    setSearchTerm("")
+    setBrandFilter("all")
+  }
+
   const handleSelect = useCallback((hardware: Hardware) => {
     if (activeCategory) {
       setSelected((prev) => ({ ...prev, [activeCategory]: hardware }))
@@ -399,8 +480,9 @@ function BuilderPageContent() {
 
       <div className="mx-auto mt-8 max-w-6xl px-6">
         <div className="flex flex-col gap-8 lg:flex-row">
-          {/* 左侧：硬件选择列表 */}
-          <div className="flex-1 space-y-3">
+          {/* 左侧：硬件选择列表 + 性能评分 */}
+          <div className="flex-1">
+            <div className="space-y-3">
             {CATEGORIES.map((cat) => {
               const Icon = cat.icon
               const selectedItem = selected[cat.key]
@@ -466,9 +548,16 @@ function BuilderPageContent() {
                 </Card>
               )
             })}
-          </div>
+            </div>
 
-          {/* 右侧：配置摘要 + 兼容性 */}
+            {/* 性能评分 + 游戏帧数 */}
+            {selectedCount > 0 && (
+              <div className="mt-8 space-y-6">
+                <PerformanceScore score={performance} />
+                <GameBenchmark benchmarks={gameBenchmarks} hasGPU={!!selected.GPU} />
+              </div>
+            )}
+          </div>
           <div className="w-full lg:w-80">
             <div className="sticky top-28 space-y-4">
               <Card className="border-0 bg-[#f5f5f7] shadow-none">
@@ -522,7 +611,12 @@ function BuilderPageContent() {
       {/* 硬件选择弹窗 */}
       <Dialog
         open={activeCategory !== null}
-        onOpenChange={(open) => !open && setActiveCategory(null)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setActiveCategory(null)
+            setCompareList([])
+          }
+        }}
       >
         <DialogContent className="max-w-2xl border-0 bg-white text-black shadow-2xl">
           <DialogHeader>
@@ -553,6 +647,36 @@ function BuilderPageContent() {
             </select>
           </div>
 
+          {/* 对比状态条 */}
+          {compareList.length > 0 && (
+            <div className="flex items-center justify-between rounded-xl bg-black/5 px-4 py-2.5">
+              <div className="flex items-center gap-2 text-sm">
+                <GitCompare className="h-4 w-4 text-black/60" />
+                <span className="text-black/70">
+                  已选 {compareList.length}/2 款对比
+                  {compareList.length === 2 && "：点击右侧按钮开始对比"}
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setCompareList([])}
+                  className="text-xs text-black/50 hover:text-black/80"
+                >
+                  清空
+                </button>
+                {compareList.length === 2 && (
+                  <Button
+                    size="sm"
+                    onClick={() => setShowCompare(true)}
+                    className="rounded-full bg-black text-white hover:bg-black/80"
+                  >
+                    开始对比
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+
           <div className="max-h-96 space-y-2 overflow-y-auto pr-2">
             {loading ? (
               <>
@@ -567,7 +691,13 @@ function BuilderPageContent() {
             ) : (
               <>
                 {filteredList.map((hw) => (
-                  <HardwareListItem key={hw.id} hw={hw} onSelect={handleSelect} />
+                  <HardwareListItem
+                    key={hw.id}
+                    hw={hw}
+                    onSelect={handleSelect}
+                    onCompare={toggleCompare}
+                    isComparing={!!compareList.find((h) => h.id === hw.id)}
+                  />
                 ))}
                 {filteredList.length === 30 && hardwareList.length > 30 && (
                   <div className="py-2 text-center text-xs text-black/60">
@@ -579,6 +709,16 @@ function BuilderPageContent() {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* 硬件对比弹窗 */}
+      {showCompare && compareList.length === 2 && (
+        <HardwareCompare
+          itemA={compareList[0]}
+          itemB={compareList[1]}
+          onClose={() => setShowCompare(false)}
+          onSelect={handleCompareSelect}
+        />
+      )}
 
       {/* 导出配置弹窗 */}
       <Dialog open={showExport} onOpenChange={setShowExport}>
